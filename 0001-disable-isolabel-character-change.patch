@@ -1,0 +1,49 @@
+From aae1b6a8399062f6aacdad5df474474ef2185f40 Mon Sep 17 00:00:00 2001
+From: sunguoshuai <sunguoshuai@huawei.com>
+Date: Fri, 11 Jan 2019 03:17:16 -0500
+Subject: [PATCH] disable isolabel character change
+
+---
+ share/templates.d/99-generic/live/x86.tmpl | 6 +++---
+ share/templates.d/99-generic/x86.tmpl      | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/share/templates.d/99-generic/live/x86.tmpl b/share/templates.d/99-generic/live/x86.tmpl
+index 9290dbb..ba0ffdc 100644
+--- a/share/templates.d/99-generic/live/x86.tmpl
++++ b/share/templates.d/99-generic/live/x86.tmpl
+@@ -9,10 +9,10 @@ LIVEDIR="LiveOS"
+ LORAXDIR="usr/share/lorax/"
+ 
+ ## Don't allow spaces or escape characters in the iso label
+-def valid_label(ch):
+-    return ch.isalnum() or ch == '_'
++#def valid_label(ch):
++#    return ch.isalnum() or ch == '_'
+ 
+-isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
++#isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
+ 
+ from os.path import basename
+ %>
+diff --git a/share/templates.d/99-generic/x86.tmpl b/share/templates.d/99-generic/x86.tmpl
+index 1b0a940..aff0255 100644
+--- a/share/templates.d/99-generic/x86.tmpl
++++ b/share/templates.d/99-generic/x86.tmpl
+@@ -9,10 +9,10 @@ KERNELDIR=PXEBOOTDIR
+ LORAXDIR="usr/share/lorax/"
+ 
+ ## Don't allow spaces or escape characters in the iso label
+-def valid_label(ch):
+-    return ch.isalnum() or ch == '_'
++#def valid_label(ch):
++#    return ch.isalnum() or ch == '_'
+ 
+-isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
++#isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
+ 
+ from os.path import basename
+ %>
+-- 
+1.8.3.1
+

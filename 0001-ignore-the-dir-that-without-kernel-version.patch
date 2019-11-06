@@ -1,0 +1,26 @@
+From 71cc3cb1f2a166b364fb3beee79df7ae076c5eab Mon Sep 17 00:00:00 2001
+From: liuxueping <liuxueping1@huawei.com>
+Date: Sat, 29 Dec 2018 17:04:05 +0000
+Subject: [PATCH] ignore the dir that without kernel version
+
+---
+ src/pylorax/treebuilder.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/pylorax/treebuilder.py b/src/pylorax/treebuilder.py
+index 0756804..64c3709 100644
+--- a/src/pylorax/treebuilder.py
++++ b/src/pylorax/treebuilder.py
+@@ -211,6 +211,9 @@ class RuntimeBuilder(object):
+         moddir = joinpaths(root, "lib/modules/")
+         for kernel in findkernels(root=root):
+             ksyms = joinpaths(root, "boot/System.map-%s" % kernel.version)
++            if not os.path.exists(ksyms):
++                logger.info("not exist %s. ignore and continue.", ksyms)
++                continue
+             logger.info("doing depmod and module-info for %s", kernel.version)
+             runcmd(["depmod", "-a", "-F", ksyms, "-b", root, kernel.version])
+             generate_module_info(moddir+kernel.version, outfile=moddir+"module-info")
+-- 
+1.8.3.1
+

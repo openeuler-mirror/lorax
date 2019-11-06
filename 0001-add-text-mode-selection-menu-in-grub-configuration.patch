@@ -1,0 +1,61 @@
+From d8b0abd7856cd9281c29a8fd54f6114eb0a428bd Mon Sep 17 00:00:00 2001
+From: liuxueping <liuxueping1@huawei.com>
+Date: Sat, 29 Dec 2018 17:27:53 +0000
+Subject: [PATCH] add text mode selection menu in grub configuration
+
+---
+ share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg     | 6 +++++-
+ .../templates.d/99-generic/live/config_files/aarch64/grub2-efi.cfg  | 6 +++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg b/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg
+index 2f6fedb..a779fe7 100644
+--- a/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg
++++ b/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg
+@@ -26,7 +26,7 @@ set timeout=60
+ search --no-floppy --set=root -l '@ISOLABEL@'
+ 
+ ### BEGIN /etc/grub.d/10_linux ###
+-menuentry 'Install @PRODUCT@ @VERSION@' --class red --class gnu-linux --class gnu --class os {
++menuentry 'Install @PRODUCT@ @VERSION@ with GUI mode' --class red --class gnu-linux --class gnu --class os {
+ 	linux @KERNELPATH@ @ROOT@ ro
+ 	initrd @INITRDPATH@
+ }
+@@ -34,6 +34,10 @@ menuentry 'Test this media & install @PRODUCT@ @VERSION@' --class red --class gn
+ 	linux @KERNELPATH@ @ROOT@ rd.live.check
+ 	initrd @INITRDPATH@
+ }
++menuentry 'Install @PRODUCT@ @VERSION@ with text mode' --class red --class gnu-linux --class gnu --class os {
++        linux @KERNELPATH@ @ROOT@ ro inst.text
++        initrd @INITRDPATH@
++}
+ submenu 'Troubleshooting -->' {
+ 	menuentry 'Install @PRODUCT@ @VERSION@ in basic graphics mode' --class red --class gnu-linux --class gnu --class os {
+ 		linux @KERNELPATH@ @ROOT@ nomodeset
+diff --git a/share/templates.d/99-generic/live/config_files/aarch64/grub2-efi.cfg b/share/templates.d/99-generic/live/config_files/aarch64/grub2-efi.cfg
+index c6a3d68..72ff14b 100644
+--- a/share/templates.d/99-generic/live/config_files/aarch64/grub2-efi.cfg
++++ b/share/templates.d/99-generic/live/config_files/aarch64/grub2-efi.cfg
+@@ -26,7 +26,7 @@ set timeout=60
+ search --no-floppy --set=root -l '@ISOLABEL@'
+ 
+ ### BEGIN /etc/grub.d/10_linux ###
+-menuentry 'Start @PRODUCT@ @VERSION@' --class red --class gnu-linux --class gnu --class os {
++menuentry 'Start @PRODUCT@ @VERSION@ with GUI mode' --class red --class gnu-linux --class gnu --class os {
+ 	linux @KERNELPATH@ @ROOT@ rd.live.image quiet
+ 	initrd @INITRDPATH@
+ }
+@@ -34,6 +34,10 @@ menuentry 'Test this media & start @PRODUCT@ @VERSION@' --class red --class gnu-
+ 	linux @KERNELPATH@ @ROOT@ rd.live.image rd.live.check quiet
+ 	initrd @INITRDPATH@
+ }
++menuentry 'Start @PRODUCT@ @VERSION@ with text mode' --class red --class gnu-linux --class gnu --class os {
++	linux @KERNELPATH@ @ROOT@ ro inst.text
++	initrd @INITRDPATH@
++}
+ submenu 'Troubleshooting -->' {
+ 	menuentry 'Install @PRODUCT@ @VERSION@ in basic graphics mode' --class red --class gnu-linux --class gnu --class os {
+ 		linux @KERNELPATH@ @ROOT@ rd.live.image nomodeset quiet
+-- 
+1.8.3.1
+

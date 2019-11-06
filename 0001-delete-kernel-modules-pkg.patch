@@ -1,0 +1,31 @@
+From 0d10194ee30c2c4548f92857f26b92ef5c9d9048 Mon Sep 17 00:00:00 2001
+From: liuxueping <liuxueping1@huawei.com>
+Date: Thu, 10 Jan 2019 18:29:51 +0000
+Subject: [PATCH] delete kernel-modules pkg
+
+---
+ share/templates.d/99-generic/runtime-install.tmpl | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/share/templates.d/99-generic/runtime-install.tmpl b/share/templates.d/99-generic/runtime-install.tmpl
+index 3dc8770..6bee5e6 100644
+--- a/share/templates.d/99-generic/runtime-install.tmpl
++++ b/share/templates.d/99-generic/runtime-install.tmpl
+@@ -9,10 +9,13 @@ installpkg rpm-ostree ostree
+ ## speed up compression on multicore systems
+ installpkg pigz
+ 
++##add by euler
++installpkg fcoe-utils libblockdev-btrfs
++
+ ## kernel and firmware
+ ## NOTE: Without explicitly including kernel-modules-extra dnf will choose kernel-debuginfo-*
+ ##       to satify a gfs2-utils kmod requirement
+-installpkg kernel kernel-modules kernel-modules-extra
++installpkg kernel
+ installpkg grubby
+ %if basearch != "s390x":
+     ## skip the firmware for sound, video, and scanners, none of which will
+-- 
+1.8.3.1
+

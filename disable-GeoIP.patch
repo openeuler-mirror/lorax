@@ -1,0 +1,32 @@
+diff -Nur a/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg b/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg
+--- a/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg	2019-03-28 16:01:10.192000000 +0800
++++ b/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg	2019-03-28 16:55:11.264000000 +0800
+@@ -27,11 +27,11 @@
+ 
+ ### BEGIN /etc/grub.d/10_linux ###
+ menuentry 'Install @PRODUCT@ @VERSION@ with text mode' --class red --class gnu-linux --class gnu --class os {
+-        linux @KERNELPATH@ @ROOT@ ro inst.text console=ttyAMA0 console=tty0
++        linux @KERNELPATH@ @ROOT@ ro inst.text inst.geoloc=0 console=ttyAMA0 console=tty0
+         initrd @INITRDPATH@
+ }
+ menuentry 'Test this media & install @PRODUCT@ @VERSION@' --class red --class gnu-linux --class gnu --class os {
+-	linux @KERNELPATH@ @ROOT@ rd.live.check inst.text console=ttyAMA0 console=tty0
++	linux @KERNELPATH@ @ROOT@ rd.live.check inst.text inst.geoloc=0 console=ttyAMA0 console=tty0
+ 	initrd @INITRDPATH@
+ }
+ menuentry 'Rescue a @PRODUCT@ system' --class red --class gnu-linux --class gnu --class os {
+diff -Nur lorax-29.16_old/share/templates.d/99-generic/config_files/aarch64/grub.conf lorax-29.16/share/templates.d/99-generic/config_files/aarch64/grub.conf
+--- lorax-29.16_old/share/templates.d/99-generic/config_files/aarch64/grub.conf	2019-03-28 16:01:10.188000000 +0800
++++ lorax-29.16/share/templates.d/99-generic/config_files/aarch64/grub.conf	2019-03-28 16:53:11.692000000 +0800
+@@ -5,9 +5,9 @@
+ hiddenmenu
+ title Install @PRODUCT@ @VERSION@
+ 	findiso
+-	kernel @KERNELPATH@ @ROOT@ quiet inst.text
++	kernel @KERNELPATH@ @ROOT@ quiet inst.text inst.geoloc=0
+ 	initrd @INITRDPATH@
+ title Test this media & install @PRODUCT@ @VERSION@
+ 	findiso
+-	kernel @KERNELPATH@ @ROOT@ rd.live.check quiet inst.text
++	kernel @KERNELPATH@ @ROOT@ rd.live.check quiet inst.text inst.geoloc=0
+ 	initrd @INITRDPATH@

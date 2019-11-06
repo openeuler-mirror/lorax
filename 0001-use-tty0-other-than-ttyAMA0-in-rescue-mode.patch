@@ -1,0 +1,25 @@
+From 7b7d4988dfab6e6fc7fa3821aa0a015455171f83 Mon Sep 17 00:00:00 2001
+From: liuxueping <liuxueping1@huawei.com>
+Date: Sat, 29 Dec 2018 17:19:27 +0000
+Subject: [PATCH] use tty0 other than ttyAMA0 in rescue mode
+
+---
+ share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg b/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg
+index 1cc389d..2f6fedb 100644
+--- a/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg
++++ b/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg
+@@ -40,7 +40,7 @@ submenu 'Troubleshooting -->' {
+ 		initrd @INITRDPATH@
+ 	}
+ 	menuentry 'Rescue a @PRODUCT@ system' --class red --class gnu-linux --class gnu --class os {
+-		linux @KERNELPATH@ @ROOT@ rescue
++		linux @KERNELPATH@ @ROOT@ rescue console=ttyAMA0 console=tty0
+ 		initrd @INITRDPATH@
+ 	}
+ }
+-- 
+1.8.3.1
+

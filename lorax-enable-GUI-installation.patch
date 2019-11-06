@@ -1,0 +1,42 @@
+diff -Nuar a/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg b/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg
+--- a/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg	2019-08-02 23:35:27.264000000 -0400
++++ b/share/templates.d/99-generic/config_files/aarch64/grub2-efi.cfg	2019-08-02 23:42:52.396000000 -0400
+@@ -1,4 +1,4 @@
+-set default="1"
++set default="2"
+ 
+ function load_video {
+   if [ x$feature_all_video_module = xy ]; then
+@@ -26,12 +26,16 @@
+ search --no-floppy --set=root -l '@ISOLABEL@'
+ 
+ ### BEGIN /etc/grub.d/10_linux ###
++menuentry 'Install @PRODUCT@ @VERSION@ with GUI mode' --class red --class gnu-linux --class gnu --class os {
++        linux @KERNELPATH@ @ROOT@ ro inst.geoloc=0
++        initrd @INITRDPATH@
++}
+ menuentry 'Install @PRODUCT@ @VERSION@ with text mode' --class red --class gnu-linux --class gnu --class os {
+         linux @KERNELPATH@ @ROOT@ ro inst.text inst.geoloc=0 console=ttyAMA0 console=tty0
+         initrd @INITRDPATH@
+ }
+ menuentry 'Test this media & install @PRODUCT@ @VERSION@' --class red --class gnu-linux --class gnu --class os {
+-	linux @KERNELPATH@ @ROOT@ rd.live.check inst.text inst.geoloc=0 console=ttyAMA0 console=tty0
++	linux @KERNELPATH@ @ROOT@ rd.live.check inst.geoloc=0
+ 	initrd @INITRDPATH@
+ }
+ menuentry 'Rescue a @PRODUCT@ system' --class red --class gnu-linux --class gnu --class os {
+diff -Nuar a/share/templates.d/99-generic/config_files/aarch64/grub.conf b/share/templates.d/99-generic/config_files/aarch64/grub.conf
+--- a/share/templates.d/99-generic/config_files/aarch64/grub.conf	2019-08-02 23:35:27.280000000 -0400
++++ b/share/templates.d/99-generic/config_files/aarch64/grub.conf	2019-08-02 23:41:29.292000000 -0400
+@@ -5,9 +5,9 @@
+ hiddenmenu
+ title Install @PRODUCT@ @VERSION@
+ 	findiso
+-	kernel @KERNELPATH@ @ROOT@ quiet inst.text inst.geoloc=0
++	kernel @KERNELPATH@ @ROOT@ quiet inst.geoloc=0
+ 	initrd @INITRDPATH@
+ title Test this media & install @PRODUCT@ @VERSION@
+ 	findiso
+-	kernel @KERNELPATH@ @ROOT@ rd.live.check quiet inst.text inst.geoloc=0
++	kernel @KERNELPATH@ @ROOT@ rd.live.check quiet inst.geoloc=0
+ 	initrd @INITRDPATH@

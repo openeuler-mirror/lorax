@@ -1,0 +1,57 @@
+diff -Nur lorax-29.16.org/share/templates.d/99-generic/runtime-cleanup.tmpl lorax-29.16/share/templates.d/99-generic/runtime-cleanup.tmpl
+--- lorax-29.16.org/share/templates.d/99-generic/runtime-cleanup.tmpl	2019-07-03 20:37:16.956000000 +0800
++++ lorax-29.16/share/templates.d/99-generic/runtime-cleanup.tmpl	2019-07-03 20:52:38.372000000 +0800
+@@ -85,6 +85,13 @@
+ 
+ ## icons cache
+ remove /usr/share/icons/*/icon-theme.cache
++remove /usr/lib/fontconfig/cache/*
++remove /lib/fontconfig/cache/*
++remove /var/lib/systemd/catalog/database
++remove /var/cache/ldconfig/aux-cache
++remove /var/log/tallylog
++remove /root/lorax-packages.log rebuildfile/rootfs/root/lorax-packages.log
++
+ 
+ ## clean up kernel modules
+ removekmod sound drivers/media drivers/hwmon \
+diff -Nur lorax-29.16.org/share/templates.d/99-generic/runtime-postinstall.tmpl lorax-29.16/share/templates.d/99-generic/runtime-postinstall.tmpl
+--- lorax-29.16.org/share/templates.d/99-generic/runtime-postinstall.tmpl	2019-07-03 20:37:16.956000000 +0800
++++ lorax-29.16/share/templates.d/99-generic/runtime-postinstall.tmpl	2019-07-03 20:51:33.296000000 +0800
+@@ -83,6 +83,36 @@
+ install ${configdir}/pam.sshd etc/pam.d/login
+ install ${configdir}/pam.sshd etc/pam.d/remote
+ 
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/91228186-0035-4ab7-a583-80b8c0acafb4/g' usr/share/fonts/aajohan-comfortaa/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/14bd5324-8247-4fd5-959e-4c676fb7a565/g' usr/share/fonts/bitmap/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/482bafab-3b6c-4800-a75e-e9150e03c4c6/g' usr/share/fonts/cantarell/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/b063668a-0121-470b-bfb2-cb866ef00550/g' usr/share/fonts/dejavu/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/dd6f2d63-2799-4d40-94ed-6a9e279523d9/g' usr/share/fonts/google-noto-cjk/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/b2bae36d-0b7f-4ae3-828a-4d1645547ec5/g' usr/share/fonts/jomolhari/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/d9675a1c-4ddc-4b36-bd9b-b7ae291731fe/g' usr/share/fonts/kacst/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/3629d762-01ea-4ab9-9e/g' usr/share/fonts/khmeros/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/5afccf87-ea92-4199-883f-6a5c3d43a4f7/g' usr/share/fonts/lklug/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/7882ea50-c955-40cc-b3/g' usr/share/fonts/lohit-assamese/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/320e3ca7-1538-4b07-9e/g' usr/share/fonts/lohit-bengali/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/242a5398-f31c-457a-a2/g' usr/share/fonts/lohit-devanagari/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/56811d0f-3154-4640-92/g' usr/share/fonts/lohit-gujarati/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/1eab1ce2-2528-46d9-b9/g' usr/share/fonts/lohit-gurmukhi/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/13c61158-ab1e-4918-8419-691dda24e833/g' usr/share/fonts/lohit-kannada/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/3d705fdf-9efc-47a4-91/g' usr/share/fonts/lohit-odia/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/4975ccbc-74df-4120-ac/g' usr/share/fonts/lohit-tamil/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/16ce5728-fa4c-440d-91/g' usr/share/fonts/lohit-telugu/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/9d5d6eea-c3be-48e9-80/g' usr/share/fonts/madan/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/84ce8a34-194e-47c0-8c/g' usr/share/fonts/sil-abyssinica/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/957787b2-56db-477e-ab/g' usr/share/fonts/sil-padauk/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/1262a8a4-1500-46f4-a3/g' usr/share/fonts/sil-scheherazade/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/ae34a6aa-984f-4723-ba/g' usr/share/fonts/smc/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/d8e92fdf-9c28-4106-bc/g' usr/share/fonts/thai-scalable/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/f2b19e9f-788f-4062-a5/g' usr/share/fonts/.uuid
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}/04b9b13b-5eab-47fc-9c/g' usr/share/X11/fonts/misc/.uuid
++
++runcmd chroot ${root} sed -i 's/[0-9a-f]\{32\}/7eb9b797f7c14fca90f2a6d89bd0a9d1/g' etc/machine-id
++
++
+ ## set up "install" user account
+ append etc/passwd "install:x:0:0:root:/root:/usr/libexec/anaconda/run-anaconda"
+ append etc/shadow "install::14438:0:99999:7:::"
