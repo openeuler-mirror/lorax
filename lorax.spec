@@ -3,11 +3,11 @@
 
 Name:           lorax
 Version:        29.16
-Release:        5
+Release:        6
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
-Source0:        https://github.com/weldr/lorax/archive/%{name}-%{version}.tar.gz
+Source0:        https://github.com/weldr/lorax/archive/%{name}-%{version}-1.tar.gz
 
 Patch9000:      0001-ignore-the-dir-that-without-kernel-version.patch
 Patch9001:      0001-add-text-mode-selection-menu-in-grub-configuration.patch
@@ -100,7 +100,7 @@ build images, etc. from the command line.
 %package_help
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{name}-%{name}-%{version}-1
 %patch9000 -p1
 %ifarch aarch64
 %patch9001 -p1
@@ -193,6 +193,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Tue Dec 31 2019 openEuler Buildteam <buildteam@openeuler.org> - 3.34.0-3
+- Type:bugfix
+- Id:NA
+- SUG:NA
+- DESC:optimization the spec
+
 * Mon Oct 21 2019 openEuler Buildteam <buildteam@openeuler.org> - 3.34.0-2
 - Type:bugfix
 - Id:NA
