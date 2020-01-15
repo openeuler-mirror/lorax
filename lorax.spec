@@ -23,7 +23,7 @@ Patch9009:      lorax-enable-anaconda-KdumpSpoke.patch
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-nose python3-pytest-mock python3-pocketlint python3-gevent
 BuildRequires:  python3-mock python3-urllib3 python3-dnf python3-librepo 
-BuildRequires:  python3-libselinux python3-mako python3-kickstart
+BuildRequires:  python3-libselinux python3-mako python3-kickstart python3-rpmfluff 
 
 Requires:       lorax-templates GConf2 cpio device-mapper dosfstools e2fsprogs
 Requires:       findutils gawk genisoimage glib2 glibc glibc-common gzip isomd5sum
