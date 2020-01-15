@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        29.16
-Release:        6
+Release:        7
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -23,7 +23,7 @@ Patch9009:      lorax-enable-anaconda-KdumpSpoke.patch
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-nose python3-pytest-mock python3-pocketlint python3-gevent
 BuildRequires:  python3-mock python3-urllib3 python3-dnf python3-librepo 
-BuildRequires:  python3-libselinux python3-mako python3-kickstart  python3-rpmfluff 
+BuildRequires:  python3-libselinux python3-mako python3-kickstart
 
 Requires:       lorax-templates GConf2 cpio device-mapper dosfstools e2fsprogs
 Requires:       findutils gawk genisoimage glib2 glibc glibc-common gzip isomd5sum
@@ -127,8 +127,6 @@ for toml in example-http-server.toml example-development.toml example-atlas.toml
     cp ./tests/pylorax/blueprints/$toml %{buildroot}/var/lib/lorax/composer/blueprints/
 done
 
-%check
-make check
 
 %pre composer
 getent group weldr >/dev/null 2>&1 || groupadd -r weldr >/dev/null 2>&1 || :
@@ -193,20 +191,26 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
-* Tue Dec 31 2019 openEuler Buildteam <buildteam@openeuler.org> - 3.34.0-3
+* Wed Jan 15 2020 openEuler Buildteam <buildteam@openeuler.org> - 29.16-7
+- Type:bugfix
+- Id:NA
+- SUG:NA
+- DESC:fix selfbuild error
+
+* Tue Dec 31 2019 openEuler Buildteam <buildteam@openeuler.org> - 29.16-6
 - Type:bugfix
 - Id:NA
 - SUG:NA
 - DESC:optimization the spec
 
-* Mon Oct 21 2019 openEuler Buildteam <buildteam@openeuler.org> - 3.34.0-2
+* Mon Oct 21 2019 openEuler Buildteam <buildteam@openeuler.org> - 29.16-5
 - Type:bugfix
 - Id:NA
 - SUG:NA
 - DESC: add lorax-lmc-virt package
 
-* Fri Oct 11 2019 openEuler Buildteam <buildteam@openeuler.org> - 3.34.0-1
-- Package init
+* Fri Oct 11 2019 openEuler Buildteam <buildteam@openeuler.org> - 29.16-4
+- spec modify
 
 * Fri Aug 23 2019 cangyi<cangyi@huawei.com> - 29.16-3
 - Type:bugfix
