@@ -1,0 +1,30 @@
+From 5dcb100b5edb443e7d39a1635a5a9aca191d2b18 Mon Sep 17 00:00:00 2001
+From: fengtao <fengtao40@huawei.com>
+Date: Mon, 24 Feb 2020 11:07:16 +0800
+Subject: [PATCH] Fix live-iso creation on aarch64
+
+---
+ share/templates.d/99-generic/live/aarch64.tmpl | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/share/templates.d/99-generic/live/aarch64.tmpl b/share/templates.d/99-generic/live/aarch64.tmpl
+index 532b242..969c0df 100644
+--- a/share/templates.d/99-generic/live/aarch64.tmpl
++++ b/share/templates.d/99-generic/live/aarch64.tmpl
+@@ -68,13 +68,6 @@ mkdir ${KERNELDIR}
+     %endif
+ %endfor
+ 
+-# Inherit iso-graft/ if it exists from external templates
+-<%
+-    import os
+-    if os.path.exists(workdir + "/iso-graft"):
+-        filegraft += " " + workdir + "/iso-graft"
+-%>
+-
+ # Add the license files
+ %for f in glob("/usr/share/licenses/*-release/*"):
+     install ${f} ${f|basename}
+-- 
+1.8.3.1
+
