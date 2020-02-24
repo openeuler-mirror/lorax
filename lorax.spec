@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        29.16
-Release:        8
+Release:        9
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -20,6 +20,8 @@ Patch9007:      eliminate-difference.patch
 Patch9008:      lorax-enable-GUI-installation.patch
 Patch9009:      lorax-enable-anaconda-KdumpSpoke.patch
 Patch9010:      lorax-delete-udisk2-iscsi.patch
+
+Patch6000:      backport-Fix-live-iso-creation-on-aarch64.patch
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-nose python3-pytest-mock python3-pocketlint python3-gevent
@@ -117,6 +119,7 @@ build images, etc. from the command line.
 %patch9008 -p1
 %patch9009 -p1
 %patch9010 -p1
+%patch6000 -p1
 %endif
 
 %build
@@ -193,6 +196,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Feb 24 2020 openEuler Buildteam <buildteam@openeuler.org> - 29.16-9
+- Type:bugfix
+- Id:NA
+- SUG:NA
+- DESC:Fix live-iso creation on aarch64
+
 * Thu Jan 16 2020 openEuler Buildteam <buildteam@openeuler.org> - 29.16-8
 - Type:bugfix
 - Id:NA
