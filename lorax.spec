@@ -1,9 +1,9 @@
 %define debug_package %{nil}
-
+%define disable_cross 0
 
 Name:           lorax
 Version:        29.16
-Release:        9
+Release:        10
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -59,6 +59,7 @@ Anaconda's image install feature.
 The package including lorax-templates-generic
 lorax-templates-generic,Generic build templates for lorax and livemedia-creator
 
+%if 0%{?disable_cross}
 %package       lmc-virt
 Summary:       livemedia-creator libvirt dependencies
 Requires:      lorax = %{version}-%{release} qemu edk2-ovmf
@@ -66,6 +67,7 @@ Recommends:    qemu-kvm
 
 %description   lmc-virt
 Additional dependencies required by livemedia-creator when using it with qemu.
+%endif
 
 %package       lmc-novirt
 Summary:       livemedia-creator no-virt dependencies
@@ -167,7 +169,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %dir %{_datadir}/lorax/templates.d
 %{_datadir}/lorax/templates.d/*
 
+%if 0%{?disable_cross}
 %files lmc-virt
+%endif
 
 %files lmc-novirt
 
@@ -196,6 +200,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Mar 16 2020 songnannan <songnannan2@huawei.com> - 29.16-10
+- disbale the virt pacakge
+
 * Mon Feb 24 2020 openEuler Buildteam <buildteam@openeuler.org> - 29.16-9
 - Type:bugfix
 - Id:NA
