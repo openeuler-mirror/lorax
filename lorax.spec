@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        29.16
-Release:        10
+Release:        11
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -200,6 +200,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon May 25 2020 songnannan <songnannan2@huawei.com> - 29.16-11
+- rebuild for the update packages
+
 * Mon Mar 16 2020 songnannan <songnannan2@huawei.com> - 29.16-10
 - disbale the virt pacakge
 
