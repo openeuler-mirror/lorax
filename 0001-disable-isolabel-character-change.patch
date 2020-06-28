@@ -24,8 +24,8 @@ index 9290dbb..ba0ffdc 100644
 -isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
 +#isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
  
+ import os
  from os.path import basename
- %>
 diff --git a/share/templates.d/99-generic/x86.tmpl b/share/templates.d/99-generic/x86.tmpl
 index 1b0a940..aff0255 100644
 --- a/share/templates.d/99-generic/x86.tmpl
@@ -41,9 +41,9 @@ index 1b0a940..aff0255 100644
  
 -isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
 +#isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
- 
+
+ import os
  from os.path import basename
- %>
 -- 
 1.8.3.1
 

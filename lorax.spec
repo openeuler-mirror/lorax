@@ -2,8 +2,8 @@
 %define disable_cross 0
 
 Name:           lorax
-Version:        29.16
-Release:        10
+Version:        31.9
+Release:        1
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -29,13 +29,14 @@ BuildRequires:  python3-mock python3-urllib3 python3-dnf python3-librepo
 BuildRequires:  python3-libselinux python3-mako python3-kickstart
 
 Requires:       lorax-templates GConf2 cpio device-mapper dosfstools e2fsprogs
-Requires:       findutils gawk genisoimage glib2 glibc glibc-common gzip isomd5sum
-Requires:       module-init-tools parted squashfs-tools util-linux xz pigz
-Requires:       dracut kpartx libselinux-python3 python3-mako python3-kickstart
+Requires:       findutils gawk xorriso glib2 glibc glibc-common gzip isomd5sum
+Requires:       module-init-tools parted squashfs-tools util-linux xz-lzma-compat xz pigz
+Requires:       pbzip2 dracut kpartx libselinux-python3 python3-mako python3-kickstart
 Requires:       python3-dnf python3-librepo 
       
 %ifarch %{ix86} x86_64
-Requires:       syslinux >= 6.02-4
+Requires:       syslinux >= 6.03-1
+Requires:       syslinux-nonlinux >= 6.03-1
 %endif
 
 %ifarch %{arm}
@@ -84,7 +85,7 @@ BuildRequires: python3-flask python3-gobject libgit2-glib python3-pytoml python3
 Requires:      lorax = %{version}-%{release}
 Requires(pre): /usr/bin/getent /usr/sbin/groupadd /usr/sbin/useradd
 
-Requires:      python3-pytoml  python3-semantic_version libgit2 libgit2-glib
+Requires:      python3-toml  python3-semantic_version libgit2 libgit2-glib
 Requires:      python3-flask python3-gevent anaconda-tui qemu-img tar
 
 %{?systemd_requires}
@@ -168,6 +169,7 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %dir %{_datadir}/lorax
 %dir %{_datadir}/lorax/templates.d
 %{_datadir}/lorax/templates.d/*
+%{_tmpfilesdir}/lorax.conf
 
 %if 0%{?disable_cross}
 %files lmc-virt
@@ -190,8 +192,8 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 
 %files -n composer-cli
 %defattr(-,root,root,-)
-%{_sysconfdir}/bash_completion.d/composer
-%{_bindir}/composer
+%{_sysconfdir}/bash_completion.d/composer-cli
+%{_bindir}/composer-cli
 %{python3_sitelib}/composer/*
 
 %files help
@@ -200,6 +202,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Thu Jun 18 2020 zhujunhao <zhujunhao8@huawei.com> - 31.9-1
+- update to 31.9
+
 * Mon Mar 16 2020 songnannan <songnannan2@huawei.com> - 29.16-10
 - disbale the virt pacakge
 

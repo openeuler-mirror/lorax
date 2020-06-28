@@ -42,11 +42,11 @@ index c6a3d68..72ff14b 100644
  ### BEGIN /etc/grub.d/10_linux ###
 -menuentry 'Start @PRODUCT@ @VERSION@' --class red --class gnu-linux --class gnu --class os {
 +menuentry 'Start @PRODUCT@ @VERSION@ with GUI mode' --class red --class gnu-linux --class gnu --class os {
- 	linux @KERNELPATH@ @ROOT@ rd.live.image quiet
+ 	linux @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image quiet
  	initrd @INITRDPATH@
  }
 @@ -34,6 +34,10 @@ menuentry 'Test this media & start @PRODUCT@ @VERSION@' --class red --class gnu-
- 	linux @KERNELPATH@ @ROOT@ rd.live.image rd.live.check quiet
+ 	linux @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image rd.live.check quiet
  	initrd @INITRDPATH@
  }
 +menuentry 'Start @PRODUCT@ @VERSION@ with text mode' --class red --class gnu-linux --class gnu --class os {
@@ -55,7 +55,7 @@ index c6a3d68..72ff14b 100644
 +}
  submenu 'Troubleshooting -->' {
  	menuentry 'Install @PRODUCT@ @VERSION@ in basic graphics mode' --class red --class gnu-linux --class gnu --class os {
- 		linux @KERNELPATH@ @ROOT@ rd.live.image nomodeset quiet
+ 		linux @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image nomodeset quiet
 -- 
 1.8.3.1
 
