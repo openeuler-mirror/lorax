@@ -2,7 +2,7 @@
 %define disable_cross 0
 
 Name:           lorax
-Version:        31.9
+Version:        33.6
 Release:        1
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
@@ -21,7 +21,6 @@ Patch9008:      lorax-enable-GUI-installation.patch
 Patch9009:      lorax-enable-anaconda-KdumpSpoke.patch
 Patch9010:      lorax-delete-udisk2-iscsi.patch
 
-Patch6000:      backport-Fix-live-iso-creation-on-aarch64.patch
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-nose python3-pytest-mock python3-pocketlint python3-gevent
@@ -122,7 +121,6 @@ build images, etc. from the command line.
 %patch9008 -p1
 %patch9009 -p1
 %patch9010 -p1
-%patch6000 -p1
 %endif
 
 %build
@@ -165,6 +163,7 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_sbindir}/lorax
 %{_sbindir}/mkefiboot
 %{_sbindir}/livemedia-creator
+%{_sbindir}/mkksiso
 %dir %{_sysconfdir}/lorax
 %dir %{_datadir}/lorax
 %dir %{_datadir}/lorax/templates.d
@@ -181,10 +180,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/lorax/composer.conf
 %{python3_sitelib}/pylorax/api/*
+%{python3_sitelib}/lifted/*
 %{_sbindir}/lorax-composer
 %{_unitdir}/lorax-composer.*
 %dir %{_datadir}/lorax/composer
 %{_datadir}/lorax/composer/*
+%{_datadir}/lorax/lifted/*
 %{_tmpfilesdir}/lorax-composer.conf
 %dir %attr(0771, root, weldr) %{_sharedstatedir}/lorax/composer/
 %dir %attr(0771, root, weldr) %{_sharedstatedir}/lorax/composer/blueprints/
@@ -202,6 +203,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Aug 3 2020 zhujunhao <zhujunhao8@huawei.com> - 33.6-1
+- update to 33.6
+
 * Thu Jun 18 2020 zhujunhao <zhujunhao8@huawei.com> - 31.9-1
 - update to 31.9
 
