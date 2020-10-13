@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        1
+Release:        2
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -203,6 +203,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Feb Oct 13 2020 yuboyun <yuboyun@huawei.com> - 33.6-2
+- add yaml file
+
 * Mon Aug 3 2020 zhujunhao <zhujunhao8@huawei.com> - 33.6-1
 - update to 33.6
 
