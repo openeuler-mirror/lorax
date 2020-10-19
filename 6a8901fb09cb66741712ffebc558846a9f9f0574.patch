@@ -1,0 +1,12 @@
+diff --git a/lorax.spec b/lorax.spec
+index 1421a9d76..c8d911063 100644
+--- a/lorax.spec
++++ b/lorax.spec
+@@ -17,6 +17,7 @@ Source0:        %{name}-%{version}.tar.gz
+ 
+ BuildRequires:  python3-devel
+ BuildRequires:  make
++BuildRequires:  systemd-rpm-macros
+ 
+ Requires:       lorax-templates
+ 
