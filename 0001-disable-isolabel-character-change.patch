@@ -1,4 +1,4 @@
-From aae1b6a8399062f6aacdad5df474474ef2185f40 Mon Sep 17 00:00:00 2001
+From 01f9f4badd249214d21e77e12bccc811ea8e2352 Mon Sep 17 00:00:00 2001
 From: sunguoshuai <sunguoshuai@huawei.com>
 Date: Fri, 11 Jan 2019 03:17:16 -0500
 Subject: [PATCH] disable isolabel character change
@@ -9,7 +9,7 @@ Subject: [PATCH] disable isolabel character change
  2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/share/templates.d/99-generic/live/x86.tmpl b/share/templates.d/99-generic/live/x86.tmpl
-index 9290dbb..ba0ffdc 100644
+index a76c062..1ed1165 100644
 --- a/share/templates.d/99-generic/live/x86.tmpl
 +++ b/share/templates.d/99-generic/live/x86.tmpl
 @@ -9,10 +9,10 @@ LIVEDIR="LiveOS"
@@ -24,10 +24,10 @@ index 9290dbb..ba0ffdc 100644
 -isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
 +#isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
  
+ import os
  from os.path import basename
- %>
 diff --git a/share/templates.d/99-generic/x86.tmpl b/share/templates.d/99-generic/x86.tmpl
-index 1b0a940..aff0255 100644
+index 3d9d0a4..bdbba04 100644
 --- a/share/templates.d/99-generic/x86.tmpl
 +++ b/share/templates.d/99-generic/x86.tmpl
 @@ -9,10 +9,10 @@ KERNELDIR=PXEBOOTDIR
@@ -42,8 +42,8 @@ index 1b0a940..aff0255 100644
 -isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
 +#isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
  
+ import os
  from os.path import basename
- %>
 -- 
 1.8.3.1
 
