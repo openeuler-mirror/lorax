@@ -2,8 +2,8 @@
 %define disable_cross 0
 
 Name:           lorax
-Version:        29.16
-Release:        11
+Version:        33.6
+Release:        1
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -21,7 +21,6 @@ Patch9008:      lorax-enable-GUI-installation.patch
 Patch9009:      lorax-enable-anaconda-KdumpSpoke.patch
 Patch9010:      lorax-delete-udisk2-iscsi.patch
 
-Patch6000:      backport-Fix-live-iso-creation-on-aarch64.patch
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-nose python3-pytest-mock python3-pocketlint python3-gevent
@@ -29,13 +28,14 @@ BuildRequires:  python3-mock python3-urllib3 python3-dnf python3-librepo
 BuildRequires:  python3-libselinux python3-mako python3-kickstart
 
 Requires:       lorax-templates GConf2 cpio device-mapper dosfstools e2fsprogs
-Requires:       findutils gawk genisoimage glib2 glibc glibc-common gzip isomd5sum
-Requires:       module-init-tools parted squashfs-tools util-linux xz pigz
-Requires:       dracut kpartx libselinux-python3 python3-mako python3-kickstart
+Requires:       findutils gawk xorriso glib2 glibc glibc-common gzip isomd5sum
+Requires:       module-init-tools parted squashfs-tools util-linux xz-lzma-compat xz pigz
+Requires:       pbzip2 dracut kpartx libselinux-python3 python3-mako python3-kickstart
 Requires:       python3-dnf python3-librepo 
       
 %ifarch %{ix86} x86_64
-Requires:       syslinux >= 6.02-4
+Requires:       syslinux >= 6.03-1
+Requires:       syslinux-nonlinux >= 6.03-1
 %endif
 
 %ifarch %{arm}
@@ -84,7 +84,7 @@ BuildRequires: python3-flask python3-gobject libgit2-glib python3-pytoml python3
 Requires:      lorax = %{version}-%{release}
 Requires(pre): /usr/bin/getent /usr/sbin/groupadd /usr/sbin/useradd
 
-Requires:      python3-pytoml  python3-semantic_version libgit2 libgit2-glib
+Requires:      python3-toml  python3-semantic_version libgit2 libgit2-glib
 Requires:      python3-flask python3-gevent anaconda-tui qemu-img tar
 
 %{?systemd_requires}
@@ -121,7 +121,6 @@ build images, etc. from the command line.
 %patch9008 -p1
 %patch9009 -p1
 %patch9010 -p1
-%patch6000 -p1
 %endif
 
 %build
@@ -164,10 +163,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_sbindir}/lorax
 %{_sbindir}/mkefiboot
 %{_sbindir}/livemedia-creator
+%{_sbindir}/mkksiso
 %dir %{_sysconfdir}/lorax
 %dir %{_datadir}/lorax
 %dir %{_datadir}/lorax/templates.d
 %{_datadir}/lorax/templates.d/*
+%{_tmpfilesdir}/lorax.conf
 
 %if 0%{?disable_cross}
 %files lmc-virt
@@ -179,10 +180,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/lorax/composer.conf
 %{python3_sitelib}/pylorax/api/*
+%{python3_sitelib}/lifted/*
 %{_sbindir}/lorax-composer
 %{_unitdir}/lorax-composer.*
 %dir %{_datadir}/lorax/composer
 %{_datadir}/lorax/composer/*
+%{_datadir}/lorax/lifted/*
 %{_tmpfilesdir}/lorax-composer.conf
 %dir %attr(0771, root, weldr) %{_sharedstatedir}/lorax/composer/
 %dir %attr(0771, root, weldr) %{_sharedstatedir}/lorax/composer/blueprints/
@@ -190,8 +193,8 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 
 %files -n composer-cli
 %defattr(-,root,root,-)
-%{_sysconfdir}/bash_completion.d/composer
-%{_bindir}/composer
+%{_sysconfdir}/bash_completion.d/composer-cli
+%{_bindir}/composer-cli
 %{python3_sitelib}/composer/*
 
 %files help
@@ -200,6 +203,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Wed Oct 28 2020 zhangqiumiao <zhangqiumiao1@huawei.com> - 33.6-1
+- upgrade to 33.6
+
 * Mon May 25 2020 songnannan <songnannan2@huawei.com> - 29.16-11
 - rebuild for the update packages
 
