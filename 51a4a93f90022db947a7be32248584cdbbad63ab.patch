@@ -1,0 +1,19 @@
+diff --git a/share/templates.d/99-generic/config_files/common/sshd_config.anaconda b/share/templates.d/99-generic/config_files/common/sshd_config.anaconda
+index 39c0967e8..e1e2bb798 100644
+--- a/share/templates.d/99-generic/config_files/common/sshd_config.anaconda
++++ b/share/templates.d/99-generic/config_files/common/sshd_config.anaconda
+@@ -1,14 +1,8 @@
+-Port 22
+ PermitRootLogin yes
+-IgnoreRhosts yes
+-StrictModes yes
+ X11Forwarding yes
+ X11DisplayOffset 10
+ PrintMotd yes
+-XAuthLocation /bin/xauth
+-KeepAlive yes
+ SyslogFacility AUTHPRIV
+-RSAAuthentication yes
+ PasswordAuthentication yes
+ PermitEmptyPasswords yes
+ PermitUserEnvironment yes
