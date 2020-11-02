@@ -1,0 +1,26 @@
+diff --git a/share/templates.d/99-generic/runtime-cleanup.tmpl b/share/templates.d/99-generic/runtime-cleanup.tmpl
+index f4cf23a69..bef907616 100644
+--- a/share/templates.d/99-generic/runtime-cleanup.tmpl
++++ b/share/templates.d/99-generic/runtime-cleanup.tmpl
+@@ -239,7 +239,7 @@ removefrom linux-firmware /usr/lib/firmware/mellanox/mlxsw_spectrum*
+     removefrom linux-firmware /usr/lib/firmware/dpaa2/*
+ %endif
+ removefrom lldpad /etc/*
+-removefrom mdadm /etc/*
++removefrom mdadm /etc/* /usr/lib/systemd/system/mdmonitor*
+ removefrom mesa-dri-drivers /usr/${libdir}/dri/*_video.so
+ removefrom mt-st /usr/sbin/*
+ removefrom mtools /etc/*
+diff --git a/share/templates.d/99-generic/runtime-postinstall.tmpl b/share/templates.d/99-generic/runtime-postinstall.tmpl
+index d4ba9f91f..4a16a1a5d 100644
+--- a/share/templates.d/99-generic/runtime-postinstall.tmpl
++++ b/share/templates.d/99-generic/runtime-postinstall.tmpl
+@@ -37,8 +37,6 @@ symlink /lib/systemd/system/rngd.service etc/systemd/system/basic.target.wants/r
+ ## Disable unwanted systemd services
+ systemctl disable systemd-readahead-collect.service \
+                   systemd-readahead-replay.service \
+-                  mdmonitor.service \
+-                  mdmonitor-takeover.service \
+                   lvm2-monitor.service \
+                   dnf-makecache.timer
+ ## These services can't be disabled normally (they're linked into place in
