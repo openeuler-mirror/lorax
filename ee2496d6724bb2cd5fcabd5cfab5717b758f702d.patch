@@ -1,0 +1,217 @@
+diff --git a/lorax.spec b/lorax.spec
+index c8d911063..de04d6308 100644
+--- a/lorax.spec
++++ b/lorax.spec
+@@ -73,6 +73,7 @@ Requires:       grub2-tools
+ 
+ %ifarch s390 s390x
+ Requires:       openssh
++Requires:       s390utils >= 2.15.0-2
+ %endif
+ 
+ %ifarch %{arm}
+@@ -166,7 +167,6 @@ make DESTDIR=$RPM_BUILD_ROOT mandir=%{_mandir} install
+ %{_sbindir}/livemedia-creator
+ %{_sbindir}/mkksiso
+ %{_bindir}/image-minimizer
+-%{_bindir}/mk-s390-cdboot
+ %dir %{_sysconfdir}/lorax
+ %config(noreplace) %{_sysconfdir}/lorax/lorax.conf
+ %dir %{_datadir}/lorax
+diff --git a/setup.py b/setup.py
+index 0de0a3467..b454f1269 100644
+--- a/setup.py
++++ b/setup.py
+@@ -19,7 +19,6 @@
+ data_files.append(("/usr/sbin", ["src/sbin/lorax", "src/sbin/mkefiboot",
+                                  "src/sbin/livemedia-creator", "src/sbin/mkksiso"]))
+ data_files.append(("/usr/bin",  ["src/bin/image-minimizer",
+-                                 "src/bin/mk-s390-cdboot",
+                                  "src/bin/composer-cli"]))
+ 
+ # get the version
+diff --git a/share/templates.d/99-generic/config_files/s390/cdboot.prm b/share/templates.d/99-generic/config_files/s390/cdboot.prm
+index d6744d05d..80c034b4f 100644
+--- a/share/templates.d/99-generic/config_files/s390/cdboot.prm
++++ b/share/templates.d/99-generic/config_files/s390/cdboot.prm
+@@ -1 +1 @@
+-ro
++ro @ROOT@
+diff --git a/share/templates.d/99-generic/live/s390.tmpl b/share/templates.d/99-generic/live/s390.tmpl
+index ec3c2e24e..08f815eae 100644
+--- a/share/templates.d/99-generic/live/s390.tmpl
++++ b/share/templates.d/99-generic/live/s390.tmpl
+@@ -6,6 +6,7 @@ KERNELDIR=BOOTDIR
+ INITRD_ADDRESS="0x02000000"
+ LIVEDIR="LiveOS"
+ LORAXDIR="usr/share/lorax/"
++MKS390IMAGE="/usr/bin/mk-s390image"
+ # The assumption seems to be that there is only one s390 kernel, ever
+ kernel = kernels[0]
+ 
+@@ -74,10 +75,10 @@ treeinfo images-${basearch} cdboot.prm ${BOOTDIR}/cdboot.prm
+ %endfor
+ 
+ ## Make a combined kernel+initrd image for the iso
+-runcmd mk-s390-cdboot -i ${outroot}/${KERNELDIR}/kernel.img \
++runcmd ${MKS390IMAGE} ${outroot}/${KERNELDIR}/kernel.img \
++                      ${outroot}/${BOOTDIR}/cdboot.img \
+                       -r ${outroot}/${KERNELDIR}/initrd.img \
+-                      -p ${outroot}/${BOOTDIR}/cdboot.prm \
+-                      -o ${outroot}/${BOOTDIR}/cdboot.img
++                      -p ${outroot}/${BOOTDIR}/cdboot.prm
+ 
+ ## make boot.iso
+ runcmd xorrisofs ${isoargs} -o ${outroot}/images/boot.iso \
+diff --git a/share/templates.d/99-generic/s390.tmpl b/share/templates.d/99-generic/s390.tmpl
+index f2241e99d..bf1d2586b 100644
+--- a/share/templates.d/99-generic/s390.tmpl
++++ b/share/templates.d/99-generic/s390.tmpl
+@@ -5,6 +5,7 @@ BOOTDIR="images"
+ KERNELDIR=BOOTDIR
+ INITRD_ADDRESS="0x02000000"
+ LORAXDIR="usr/share/lorax/"
++MKS390IMAGE="/usr/bin/mk-s390image"
+ # The assumption seems to be that there is only one s390 kernel, ever
+ kernel = kernels[0]
+ 
+@@ -32,6 +33,7 @@ install ${configdir}/generic.ins .
+ 
+ ## configure bootloader
+ replace @INITRD_LOAD_ADDRESS@ ${INITRD_ADDRESS} generic.ins
++replace @ROOT@ 'inst.stage2=hd:LABEL=${isolabel|udev}' ${BOOTDIR}/cdboot.prm
+ 
+ ## install kernel
+ installkernel images-${basearch} ${kernel.path} ${KERNELDIR}/kernel.img
+@@ -70,10 +72,10 @@ treeinfo images-${basearch} redhat.exec ${BOOTDIR}/redhat.exec
+ %endfor
+ 
+ ## Make a combined kernel+initrd image for the iso
+-runcmd mk-s390-cdboot -i ${outroot}/${KERNELDIR}/kernel.img \
++runcmd ${MKS390IMAGE} ${outroot}/${KERNELDIR}/kernel.img \
++                      ${outroot}/${BOOTDIR}/cdboot.img \
+                       -r ${outroot}/${KERNELDIR}/initrd.img \
+-                      -p ${outroot}/${BOOTDIR}/cdboot.prm \
+-                      -o ${outroot}/${BOOTDIR}/cdboot.img
++                      -p ${outroot}/${BOOTDIR}/cdboot.prm
+ 
+ ## make boot.iso
+ runcmd xorrisofs ${isoargs} -o ${outroot}/images/boot.iso \
+diff --git a/src/bin/mk-s390-cdboot b/src/bin/mk-s390-cdboot
+deleted file mode 100755
+index c96653a89..000000000
+--- a/src/bin/mk-s390-cdboot
++++ /dev/null
+@@ -1,112 +0,0 @@
+-#!/usr/bin/python3
+-#
+-# mk-s390-cdboot
+-#
+-# Copyright (C) 2017  Red Hat, Inc.
+-#
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-#
+-import argparse
+-import os
+-import shutil
+-from struct import pack
+-import sys
+-
+-
+-INITRD_START        = 0x0000000000800000
+-START_PSW_ADDRESS   = 0x80010000
+-KERNEL_PSW_ADDRESS  = 0x04
+-KERNEL_INITRD_START = 0x10408
+-KERNEL_INITRD_SIZE  = 0x10410
+-KERNEL_CMDLINE      = 0x10480
+-# See https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/s390/include/uapi/asm/setup.h
+-KERNEL_CMDLINE_SIZE = 896
+-
+-
+-def setup_parser():
+-    """ Setup the cmdline parser"""
+-    parser = argparse.ArgumentParser(description="Create s390 boot image")
+-    parser.add_argument("-i", dest="kernel", required=True, metavar="KERNEL",
+-                        help="The kernel.img file")
+-    parser.add_argument("-r", dest="ramdisk", required=True, metavar="RAMDISK",
+-                        help="The initrd.img file")
+-    parser.add_argument("-p", dest="parmfile", required=True, metavar="PARMFILE",
+-                        help="The parm file")
+-    parser.add_argument("-o", dest="outfile", required=True, metavar="OUTFILE",
+-                        help="The output image file")
+-    return parser
+-
+-
+-def copy_kernel(kernel, outfile):
+-    """ Copy the kernel to the outfile"""
+-    shutil.copy2(kernel, outfile)
+-
+-
+-def append_ramdisk(ramdisk, outfile):
+-    """ Append the ramdisk to the kernel and return its size"""
+-    with open(ramdisk, "rb") as ram_fd:
+-        with open(outfile, "r+b") as out_fd:
+-            out_fd.seek(INITRD_START)
+-            out_fd.write(ram_fd.read())
+-    return os.stat(ramdisk).st_size
+-
+-
+-def configure_kernel(outfile, parmfile, size):
+-    """ Configure the kernel with the ramdisk start address and size."""
+-    with open(outfile, "r+b") as out_fd:
+-        # Change the start PSW address
+-        out_fd.seek(KERNEL_PSW_ADDRESS)
+-        out_fd.write(pack(">L", START_PSW_ADDRESS))
+-
+-        # Write the initrd start and size
+-        out_fd.seek(KERNEL_INITRD_START)
+-        out_fd.write(pack(">Q", INITRD_START))
+-        out_fd.seek(KERNEL_INITRD_SIZE)
+-        out_fd.write(pack(">Q", size))
+-
+-        # Erase the previous COMMAND_LINE, write zeros
+-        out_fd.seek(KERNEL_CMDLINE)
+-        out_fd.write(bytes(KERNEL_CMDLINE_SIZE))
+-
+-        # Write the first line of the parmfile
+-        cmdline = open(parmfile, "r").readline().strip()
+-        out_fd.seek(KERNEL_CMDLINE)
+-        out_fd.write(bytes(cmdline, "utf-8"))
+-
+-
+-def main():
+-    parser = setup_parser()
+-    args = parser.parse_args()
+-
+-    errors = []
+-    for f in [args.kernel, args.ramdisk, args.parmfile]:
+-        if not os.path.exists(f):
+-            errors.append("ERROR: %s is missing" % f)
+-    if errors:
+-        for e in errors:
+-            print(e)
+-        sys.exit(1)
+-
+-    print("Creating bootable CD-ROM image...")
+-    print("kernel is  : %s" % args.kernel)
+-    print("ramdisk is : %s" % args.ramdisk)
+-    print("parmfile is: %s" % args.parmfile)
+-    print("outfile is : %s" % args.outfile)
+-
+-    copy_kernel(args.kernel, args.outfile)
+-    size = append_ramdisk(args.ramdisk, args.outfile)
+-    configure_kernel(args.outfile, args.parmfile, size)
+-
+-if __name__ == '__main__':
+-    main()
