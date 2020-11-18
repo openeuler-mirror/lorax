@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index 6a4981b60..2e04715ff 100644
+--- a/Makefile
++++ b/Makefile
+@@ -111,7 +111,7 @@ local:
+ 	@echo "The archive is in $(PKGNAME)-$(VERSION).tar.gz"
+ 
+ test-in-copy:
+-	rsync -aP --exclude=.git /lorax-ro/ /lorax/
++	rsync -a --exclude=.git /lorax-ro/ /lorax/
+ 	make -C /lorax/ $(RUN_TESTS)
+ 	cp /lorax/.coverage /test-results/
+ 
