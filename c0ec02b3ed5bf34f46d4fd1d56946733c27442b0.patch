@@ -1,0 +1,74 @@
+diff --git a/.coveragerc b/.coveragerc
+index 2b9abc36e..3a4ce4c5a 100644
+--- a/.coveragerc
++++ b/.coveragerc
+@@ -1,3 +1,5 @@
+ [paths]
+ source = .
+         /lorax/
++[run]
++relative_files = True
+diff --git a/.github/workflows/tests.yml b/.github/workflows/tests.yml
+new file mode 100644
+index 000000000..7860f5831
+--- /dev/null
++++ b/.github/workflows/tests.yml
+@@ -0,0 +1,28 @@
++name: Tests and Coverage
++# Make sure only one action triggers the job, otherwise pushing to a
++# pull-request will run it twice.
++on:
++  pull_request:
++    branches:
++      - "*"
++  push:
++    branches:
++      - master
++      - rhel8-branch
++      - rhel7-branch
++      - f31-branch
++      - f32-branch
++      - f33-branch
++
++jobs:
++  unit-tests:
++    runs-on: ubuntu-latest
++    steps:
++      - name: "Clone Repository"
++        uses: actions/checkout@v2
++      - name: Run lorax tests in podman
++        run: make test-in-docker && cp .test-results/.coverage .coverage
++      - name: Coveralls
++        uses: AndreMiras/coveralls-python-action@develop
++        with:
++          github-token: ${{ secrets.GITHUB_TOKEN }}
+diff --git a/.travis.yml b/.travis.yml
+deleted file mode 100644
+index f252ebbb1..000000000
+--- a/.travis.yml
++++ /dev/null
+@@ -1,24 +0,0 @@
+-sudo: required
+-language: python
+-services:
+-  - docker
+-
+-env:
+-  - DOCKER=docker
+-
+-script:
+-  - make test-in-docker
+-
+-after_success:
+-  - |
+-
+-        cp .test-results/.coverage ./.coverage.docker
+-
+-        pip install coverage coveralls
+-        coverage combine
+-        coveralls
+-
+-notifications:
+-  email:
+-    on_failure: change
+-    on_success: never
