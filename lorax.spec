@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        2
+Release:        3
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -20,6 +20,7 @@ Patch9007:      eliminate-difference.patch
 Patch9008:      lorax-enable-GUI-installation.patch
 Patch9009:      lorax-enable-anaconda-KdumpSpoke.patch
 Patch9010:      lorax-delete-udisk2-iscsi.patch
+Patch9011: 07600b24180f5ec27903c3d178c09e73e2d5f0c8.patch
 
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
@@ -203,6 +204,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* 20201209035849743332 patch-tracking 33.6-3
+- append patch file of upstream repository from <07600b24180f5ec27903c3d178c09e73e2d5f0c8> to <07600b24180f5ec27903c3d178c09e73e2d5f0c8>
+
 * Feb Oct 13 2020 yuboyun <yuboyun@huawei.com> - 33.6-2
 - add yaml file
 
@@ -303,5 +307,4 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 - DESC:use tty0 rather than ttyAMA0 for rescue mode on aarch64 machine
        ignore the dir that without kernel version
        add text mode in aarch64 installation
-
 
