@@ -1,0 +1,14 @@
+diff --git a/src/pylorax/monitor.py b/src/pylorax/monitor.py
+index 9de1ccb12..e0d2ed1a4 100644
+--- a/src/pylorax/monitor.py
++++ b/src/pylorax/monitor.py
+@@ -46,7 +46,8 @@ class LogRequestHandler(socketserver.BaseRequestHandler):
+         "crashed on signal",
+         "packaging: Missed: NoSuchPackage",
+         "packaging: Installation failed",
+-        "The following error occurred while installing.  This is a fatal error"
++        "The following error occurred while installing.  This is a fatal error",
++        "Error in POSTIN scriptlet in rpm package"
+     ]
+ 
+     re_tests = [
