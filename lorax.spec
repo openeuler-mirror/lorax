@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        2
+Release:        3
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -20,6 +20,10 @@ Patch9007:      eliminate-difference.patch
 Patch9008:      lorax-enable-GUI-installation.patch
 Patch9009:      lorax-enable-anaconda-KdumpSpoke.patch
 Patch9010:      lorax-delete-udisk2-iscsi.patch
+Patch9011: 6400515880e59ab7d0d68a848e2f57052faa0d30.patch
+Patch9012: a33efe7c517737f9849673f1f2d2ce2fedc04014.patch
+Patch9013: b0318efeadfe186dbd4958f58ba18ce17d75d3e1.patch
+Patch9014: f6924f8f1f7f1cbdaedeb3c9844145553d4a4fe1.patch
 
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
@@ -203,6 +207,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* 20201217065849742361 patch-tracking 33.6-3
+- append patch file of upstream repository from <6400515880e59ab7d0d68a848e2f57052faa0d30> to <f6924f8f1f7f1cbdaedeb3c9844145553d4a4fe1>
+
 * Feb Oct 13 2020 yuboyun <yuboyun@huawei.com> - 33.6-2
 - add yaml file
 
@@ -303,5 +310,4 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 - DESC:use tty0 rather than ttyAMA0 for rescue mode on aarch64 machine
        ignore the dir that without kernel version
        add text mode in aarch64 installation
-
 
