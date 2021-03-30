@@ -3,24 +3,27 @@
 
 Name:           lorax
 Version:        33.6
-Release:        2
+Release:        3
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
 Source0:        https://github.com/weldr/lorax/archive/%{name}-%{version}-1.tar.gz
 
-Patch9000:      0001-ignore-the-dir-that-without-kernel-version.patch
-Patch9001:      0001-add-text-mode-selection-menu-in-grub-configuration.patch
-Patch9002:      0001-use-tty0-other-than-ttyAMA0-in-rescue-mode.patch
-Patch9003:      0001-delete-kernel-modules-pkg.patch
-Patch9004:      0001-disable-isolabel-character-change.patch
-Patch9005:      disable-graphics-install.patch
-Patch9006:      disable-GeoIP.patch
-Patch9007:      eliminate-difference.patch
-Patch9008:      lorax-enable-GUI-installation.patch
-Patch9009:      lorax-enable-anaconda-KdumpSpoke.patch
-Patch9010:      lorax-delete-udisk2-iscsi.patch
-
+Patch0:		0001-ignore-the-dir-that-without-kernel-version.patch
+Patch1:		0001-add-text-mode-selection-menu-in-grub-configuration.patch
+Patch2:		0001-use-tty0-other-than-ttyAMA0-in-rescue-mode.patch
+Patch3:		0001-delete-kernel-modules-pkg.patch
+Patch4:		0001-disable-isolabel-character-change.patch
+Patch5:		disable-graphics-install.patch
+Patch6:		disable-GeoIP.patch
+Patch7:		eliminate-difference.patch
+Patch8:		lorax-enable-GUI-installation.patch
+Patch9:		lorax-enable-anaconda-KdumpSpoke.patch
+Patch10:	lorax-delete-udisk2-iscsi.patch
+Patch11:	backport-Do-not-use-loglevel-option-when-running-Anaconda.patch
+Patch12:	backport-Improve-lmc-no-virt-error-handling.patch
+Patch13:	backport-Add-POSTIN-scriptlet-error-to-the-log-monitor-list.patch
+Patch14:	backport-Remove-LD_PRELOAD-libgomp.so.1-from-lmc-no-virt.patch
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-nose python3-pytest-mock python3-pocketlint python3-gevent
@@ -106,22 +109,27 @@ build images, etc. from the command line.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}-1
-%patch9000 -p1
+%patch0 -p1
 %ifarch aarch64
-%patch9001 -p1
-%patch9002 -p1
+%patch1 -p1
+%patch2 -p1
 %endif
-%patch9003 -p1
+%patch3 -p1
 
-%patch9004 -p1
+%patch4 -p1
 %ifarch aarch64
-%patch9005 -p1
-%patch9006 -p1
-%patch9007 -p1
-%patch9008 -p1
-%patch9009 -p1
-%patch9010 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
 %endif
+
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
 
 %build
 %make_build
@@ -203,6 +211,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Feb Mar 30 2021 yuboyun <yuboyun@huawei.com> - 33.6-3
+- Do not use '--loglevel' option when running Anaconda
+  Improve Imc no-virt error handling
+  Add POSTIN scriptlet error to the log monitor list
+  Remove LD_PRELOAD libgomp.so.1 from Imc --no-virt
+
 * Feb Oct 13 2020 yuboyun <yuboyun@huawei.com> - 33.6-2
 - add yaml file
 

@@ -1,0 +1,33 @@
+From b0318efeadfe186dbd4958f58ba18ce17d75d3e1 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Tue, 8 Dec 2020 16:19:38 -0800
+Subject: [PATCH] Remove LD_PRELOAD libgomp.so.1 from lmc --no-virt
+
+The libgomp bug rhbz#1722181 has been closed since August.
+---
+ src/pylorax/installer.py | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/src/pylorax/installer.py b/src/pylorax/installer.py
+index 1528474..e11c16b 100644
+--- a/src/pylorax/installer.py
++++ b/src/pylorax/installer.py
+@@ -403,14 +403,12 @@ def novirt_install(opts, disk_img, disk_size, cancel_func=None, tar_img=None):
+         cancel_funcs.append(cancel_func)
+ 
+     # Make sure anaconda has the right product and release
+-    # Preload libgomp.so.1 to workaround rhbz#1722181
+     log.info("Running anaconda.")
+     try:
+         unshare_args = ["--pid", "--kill-child", "--mount", "--propagation", "unchanged", "anaconda"] + args
+         for line in execReadlines("unshare", unshare_args, reset_lang=False,
+                                   env_add={"ANACONDA_PRODUCTNAME": opts.project,
+-                                           "ANACONDA_PRODUCTVERSION": opts.releasever,
+-                                           "LD_PRELOAD": "libgomp.so.1"},
++                                           "ANACONDA_PRODUCTVERSION": opts.releasever},
+                                   callback=lambda p: not novirt_cancel_check(cancel_funcs, p)):
+             log.info(line)
+ 
+-- 
+1.8.3.1
+
