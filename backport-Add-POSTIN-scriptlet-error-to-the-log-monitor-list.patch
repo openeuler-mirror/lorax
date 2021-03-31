@@ -1,0 +1,31 @@
+From a33efe7c517737f9849673f1f2d2ce2fedc04014 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Tue, 8 Dec 2020 16:03:07 -0800
+Subject: [PATCH] Add POSTIN scriptlet error to the log monitor list
+
+This will cause livemedia-creator to terminate anaconda and exit when an
+install hits an error that often causes anaconda to get stuck and not
+exit.
+
+Resolves: rhbz#1900596
+---
+ src/pylorax/monitor.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/pylorax/monitor.py b/src/pylorax/monitor.py
+index 9de1ccb..e0d2ed1 100644
+--- a/src/pylorax/monitor.py
++++ b/src/pylorax/monitor.py
+@@ -46,7 +46,8 @@ class LogRequestHandler(socketserver.BaseRequestHandler):
+         "crashed on signal",
+         "packaging: Missed: NoSuchPackage",
+         "packaging: Installation failed",
+-        "The following error occurred while installing.  This is a fatal error"
++        "The following error occurred while installing.  This is a fatal error",
++        "Error in POSTIN scriptlet in rpm package"
+     ]
+ 
+     re_tests = [
+-- 
+1.8.3.1
+
