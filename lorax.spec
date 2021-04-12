@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        2
+Release:        3
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -209,6 +209,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Apr 12 orange-snn <songnannan2@huawei.com> - 33.6-3
+- add python3-pycdlib in requires for livecd
+
 * Feb Mar 30 2021 yuboyun <yuboyun@huawei.com> - 33.6-2
 - Do not use '--loglevel' option when running Anaconda
   Improve Imc no-virt error handling
