@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        2
+Release:        3
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -34,7 +34,7 @@ Requires:       lorax-templates GConf2 cpio device-mapper dosfstools e2fsprogs
 Requires:       findutils gawk xorriso glib2 glibc glibc-common gzip isomd5sum
 Requires:       module-init-tools parted squashfs-tools util-linux xz-lzma-compat xz pigz
 Requires:       pbzip2 dracut kpartx libselinux-python3 python3-mako python3-kickstart
-Requires:       python3-dnf python3-librepo 
+Requires:       python3-dnf python3-librepo python3-pycdlib
       
 %ifarch %{ix86} x86_64
 Requires:       syslinux >= 6.03-1
@@ -209,6 +209,9 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Apr 12 2021 orange-snn <songnannan2@huawei.com> - 33.6-3
+- add python3-pycdlib in requires for livecd
+
 * Feb Mar 30 2021 yuboyun <yuboyun@huawei.com> - 33.6-2
 - Do not use '--loglevel' option when running Anaconda
   Improve Imc no-virt error handling
