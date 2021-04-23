@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        4
+Release:        5
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -24,6 +24,7 @@ Patch11:	backport-Do-not-use-loglevel-option-when-running-Anaconda.patch
 Patch12:	backport-Improve-lmc-no-virt-error-handling.patch
 Patch13:	backport-Add-POSTIN-scriptlet-error-to-the-log-monitor-list.patch
 Patch14:	backport-Remove-LD_PRELOAD-libgomp.so.1-from-lmc-no-virt.patch
+Patch15:        backport-runtime-install-don-t-install-notification-daemon.patch
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-nose python3-pytest-mock python3-pocketlint python3-gevent
@@ -130,6 +131,7 @@ build images, etc. from the command line.
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
+%patch15 -p1
 
 %build
 %make_build
@@ -211,16 +213,19 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Fri Apr 23 2021 zhangqiumiao <zhangqiumiao1@huawei.com> - 33.6-5
+- runtime-install: don't install notification-daemon
+
 * Mon Apr 12 2021 orange-snn <songnannan2@huawei.com> - 33.6-4
 - add python3-pycdlib in requires for livecd
 
-* Feb Mar 30 2021 yuboyun <yuboyun@huawei.com> - 33.6-3
+* Tue Mar 30 2021 yuboyun <yuboyun@huawei.com> - 33.6-3
 - Do not use '--loglevel' option when running Anaconda
   Improve Imc no-virt error handling
   Add POSTIN scriptlet error to the log monitor list
   Remove LD_PRELOAD libgomp.so.1 from Imc --no-virt
 
-* Feb Oct 13 2020 yuboyun <yuboyun@huawei.com> - 33.6-2
+* Tue Oct 13 2020 yuboyun <yuboyun@huawei.com> - 33.6-2
 - add yaml file
 
 * Mon Aug 3 2020 zhujunhao <zhujunhao8@huawei.com> - 33.6-1
