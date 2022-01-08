@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        5
+Release:        6
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -27,7 +27,7 @@ Patch14:	backport-Remove-LD_PRELOAD-libgomp.so.1-from-lmc-no-virt.patch
 Patch15:        backport-runtime-install-don-t-install-notification-daemon.patch
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
-BuildRequires:  python3-nose python3-pytest-mock python3-pocketlint python3-gevent
+BuildRequires:  python3-pytest-mock python3-pocketlint python3-gevent
 BuildRequires:  python3-mock python3-urllib3 python3-dnf python3-librepo 
 BuildRequires:  python3-libselinux python3-mako python3-kickstart
 
@@ -213,6 +213,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Sat Jan 08 2022 xihaochen <xihaochen@huawei.com> - 33.6-6
+- Type:requriements
+- Id:NA
+- SUG:NA
+- DESC:remove python-nose dependency
+
 * Fri Apr 23 2021 zhangqiumiao <zhangqiumiao1@huawei.com> - 33.6-5
 - runtime-install: don't install notification-daemon
 
