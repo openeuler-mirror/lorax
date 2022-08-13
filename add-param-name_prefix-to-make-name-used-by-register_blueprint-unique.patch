@@ -1,0 +1,32 @@
+From aaf6e6d7808f00ae0db6f1ef9c8d02fbd3f62319 Mon Sep 17 00:00:00 2001
+From: zhouyihang <zhouyihang3@h-partners.com>
+Date: Sat, 23 Aug 2022 15:54:15 -0500
+Subject: [PATCH] add param name_prefix to make name used by register_blueprint() unique
+
+---
+ src/pylorax/api/server.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/pylorax/api/server.py b/src/pylorax/api/server.py
+index 1c42d94..fd2a9ff 100644
+--- a/src/pylorax/api/server.py
++++ b/src/pylorax/api/server.py
+@@ -85,7 +85,7 @@ def bad_request(error):
+     return jsonify(status=False, errors=[{ "id": HTTP_ERROR, "code": error.code, "msg": error.name }]), error.code
+
+ # Register the v0 API on /api/v0/
+-server.register_blueprint(v0_api, url_prefix="/api/v0/")
++server.register_blueprint(v0_api, url_prefix="/api/v0/", name_prefix="v0")
+
+ # Register the v1 API on /api/v1/
+ # Use v0 routes by default
+@@ -99,5 +99,5 @@ skip_rules = [
+     "/projects/source/info/<source_names>",
+     "/projects/source/new",
+ ]
+-server.register_blueprint(v0_api, url_prefix="/api/v1/", skip_rules=skip_rules)
+-server.register_blueprint(v1_api, url_prefix="/api/v1/")
++server.register_blueprint(v0_api, url_prefix="/api/v1/", skip_rules=skip_rules, name_prefix="v1")
++server.register_blueprint(v1_api, url_prefix="/api/v1/", name_prefix="v1")
+--
+2.27.0
