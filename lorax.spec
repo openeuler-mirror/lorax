@@ -212,7 +212,7 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 * Mon Apr 12 2021 orange-snn <songnannan2@huawei.com> - 33.6-3
 - add python3-pycdlib in requires for livecd
 
-* Feb Mar 30 2021 yuboyun <yuboyun@huawei.com> - 33.6-2
+* Tue Mar 30 2021 yuboyun <yuboyun@huawei.com> - 33.6-2
 - Do not use '--loglevel' option when running Anaconda
   Improve Imc no-virt error handling
   Add POSTIN scriptlet error to the log monitor list
