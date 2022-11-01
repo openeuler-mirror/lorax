@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        7
+Release:        8
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -26,6 +26,7 @@ Patch13:	backport-Add-POSTIN-scriptlet-error-to-the-log-monitor-list.patch
 Patch14:	backport-Remove-LD_PRELOAD-libgomp.so.1-from-lmc-no-virt.patch
 Patch15:        backport-runtime-install-don-t-install-notification-daemon.patch
 Patch16:        add-param-name_prefix-to-make-name-used-by-register_blueprint-unique.patch
+Patch100:	0001-support-loongarch-for-lorax.patch
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-pytest-mock python3-pocketlint python3-gevent
@@ -134,6 +135,9 @@ build images, etc. from the command line.
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
+%ifarch loongarch64
+%patch100 -p1
+%endif
 
 %build
 %make_build
@@ -215,6 +219,11 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Mar 28 2022 Wenlong Zhang <zhangwenlong@loongson.cn> - 33.6-8
+- ID:NA
+- SUG:NA
+- DESC: add loongarch support for lorax
+
 * Sat Aug 13 2022 zhouyihang <zhouyihang3@h-partners.com> - 33.6-7
 - Type:bugfix
 - ID:NA
