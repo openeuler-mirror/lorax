@@ -1,0 +1,50 @@
+From adb3a4a4dcdbcd5965efa662bd9b3c9377b589f4 Mon Sep 17 00:00:00 2001
+From: Wenlong Zhang <zhangwenlong@loongson.cn>
+Date: Sun, 16 Oct 2022 23:10:03 +0000
+Subject: [PATCH] support loongarch for lorax
+
+---
+ src/pylorax/__init__.py    | 7 +++++--
+ src/pylorax/treebuilder.py | 1 +
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/pylorax/__init__.py b/src/pylorax/__init__.py
+index 8700ff5..e757cad 100644
+--- a/src/pylorax/__init__.py
++++ b/src/pylorax/__init__.py
+@@ -64,7 +64,7 @@ DRACUT_DEFAULT = ["--xz", "--install", "/.buildstamp", "--no-early-microcode", "
+ DEFAULT_PLATFORM_ID = "platform:f32"
+ 
+ class ArchData(DataHolder):
+-    lib64_arches = ("x86_64", "ppc64le", "s390x", "ia64", "aarch64")
++    lib64_arches = ("x86_64", "ppc64le", "s390x", "ia64", "aarch64", "loongarch64")
+     bcj_arch = dict(i386="x86", x86_64="x86",
+                     ppc64le="powerpc",
+                     arm="arm", armhfp="arm")
+@@ -351,7 +351,10 @@ class Lorax(BaseLoraxClass):
+             for arg in user_dracut_args:
+                 dracut_args += arg.split(" ", 1)
+ 
+-        anaconda_args = dracut_args + ["--add", "anaconda pollcdrom qemu qemu-net"]
++        if self.arch.basearch == "loongarch64":
++            anaconda_args = dracut_args + ["--add", "anaconda pollcdrom qemu qemu-net"]
++        else:
++            anaconda_args = dracut_args + ["--add", "anaconda pollcdrom qemu qemu-net prefixdevname-tools"]
+ 
+         logger.info("dracut args = %s", dracut_args)
+         logger.info("anaconda args = %s", anaconda_args)
+diff --git a/src/pylorax/treebuilder.py b/src/pylorax/treebuilder.py
+index 2e8d152..039109e 100644
+--- a/src/pylorax/treebuilder.py
++++ b/src/pylorax/treebuilder.py
+@@ -42,6 +42,7 @@ templatemap = {
+     'aarch64': 'aarch64.tmpl',
+     'arm':     'arm.tmpl',
+     'armhfp':  'arm.tmpl',
++    'loongarch64':  'loongarch64.tmpl',
+ }
+ 
+ def generate_module_info(moddir, outfile=None):
+-- 
+2.33.0
+
