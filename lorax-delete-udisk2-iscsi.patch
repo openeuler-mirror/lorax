@@ -8,18 +8,17 @@ Subject: [PATCH] delete udisk2-iscsi
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/share/templates.d/99-generic/runtime-install.tmpl b/share/templates.d/99-generic/runtime-install.tmpl
-index 6bee5e6..9cf6b5b 100644
+index 159222b..cad3c7c 100644
 --- a/share/templates.d/99-generic/runtime-install.tmpl
 +++ b/share/templates.d/99-generic/runtime-install.tmpl
 @@ -106,7 +106,7 @@ installpkg xfsdump
- 
+
  ## extra storage packages
  # hostname is needed for iscsi to work, see RHBZ#1593917
 -installpkg udisks2 udisks2-iscsi hostname
 +installpkg udisks2 hostname
- 
- ## extra libblockdev plugins
- installpkg libblockdev-lvm-dbus
--- 
-1.8.3.1
-
+ %if basearch in ("i386", "x86_64"):
+     installpkg fcoe-utils
+ %endif
+--
+2.33.0
