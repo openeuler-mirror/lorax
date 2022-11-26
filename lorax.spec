@@ -3,7 +3,7 @@
 
 Name:           lorax
 Version:        33.6
-Release:        8
+Release:        9
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
@@ -185,6 +185,7 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %dir %{_datadir}/lorax/templates.d
 %{_datadir}/lorax/templates.d/*
 %{_tmpfilesdir}/lorax.conf
+%exclude %{python3_sitelib}/pylorax/api
 
 %if 0%{?disable_cross}
 %files lmc-virt
@@ -195,7 +196,7 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %files composer
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/lorax/composer.conf
-%{python3_sitelib}/pylorax/api/*
+%{python3_sitelib}/pylorax/api
 %{python3_sitelib}/lifted/*
 %{_sbindir}/lorax-composer
 %{_unitdir}/lorax-composer.*
@@ -219,6 +220,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Sat Nov 26 2022 zhouyihang <zhouyihang3@h-partners.com> - 33.6-9
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:remove duplicate files in lorax
+
 * Mon Mar 28 2022 Wenlong Zhang <zhangwenlong@loongson.cn> - 33.6-8
 - ID:NA
 - SUG:NA
