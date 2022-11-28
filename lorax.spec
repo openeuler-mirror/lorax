@@ -27,6 +27,15 @@ Patch14:	backport-Remove-LD_PRELOAD-libgomp.so.1-from-lmc-no-virt.patch
 Patch16:        add-param-name_prefix-to-make-name-used-by-register_blueprint-unique.patch
 Patch100:	0001-support-loongarch-for-lorax.patch
 
+%ifarch sw_64
+SOURCE1:        sw64.tar.gz
+Patch200:        0001-sw64-modify.patch
+Patch201:        0002-sw64-modify.patch
+Patch202:        runtime-tmpl-sw64.patch
+Patch203:        0001-sw64-tmpl-label-modify.patch
+Patch204:        0001-sw64-tmpl-and-treebuild-modify.patch
+%endif
+
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-pytest python3-pytest-mock python3-pocketlint python3-gevent
 BuildRequires:  python3-mock python3-urllib3 python3-dnf python3-librepo 
@@ -137,6 +146,14 @@ build images, etc. from the command line.
 %patch100 -p1
 %endif
 
+%ifarch sw_64
+%patch200 -p1
+%patch201 -p1
+%patch202 -p1
+%patch203 -p1
+%patch204 -p1
+%endif
+
 %build
 %make_build
 
@@ -147,6 +164,9 @@ for toml in example-http-server.toml example-development.toml example-atlas.toml
     cp ./tests/pylorax/blueprints/$toml %{buildroot}/var/lib/lorax/composer/blueprints/
 done
 
+%ifarch sw_64
+tar -zxvf %SOURCE1 -C %{buildroot}/%{_datadir}/lorax/templates.d/99-generic/config_files/
+%endif
 
 %pre composer
 getent group weldr >/dev/null 2>&1 || groupadd -r weldr >/dev/null 2>&1 || :
