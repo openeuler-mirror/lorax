@@ -3,11 +3,14 @@
 
 Name:           lorax
 Version:        34.1
-Release:        2
+Release:        3 
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
 Source0:        https://github.com/weldr/lorax/archive/%{name}-%{version}-1.tar.gz
+%ifarch sw_64
+Source1:        sw64.tar.gz
+%endif
 
 Patch0:		0001-ignore-the-dir-that-without-kernel-version.patch
 Patch1:		0001-add-text-mode-selection-menu-in-grub-configuration.patch
@@ -29,7 +32,6 @@ Patch16:        add-param-name_prefix-to-make-name-used-by-register_blueprint-un
 Patch100:	0001-support-loongarch-for-lorax.patch
 
 %ifarch sw_64
-SOURCE1:        sw64.tar.gz
 Patch200:        0001-sw64-modify.patch
 Patch201:        0002-sw64-modify.patch
 Patch202:        runtime-tmpl-sw64.patch
@@ -240,6 +242,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Dec 11 2022 qiuwenjuan <wenjuan.qiu@i-soft.com.cn> - 34.1-3
+- Type:requirement
+- ID:NA
+- SUG:NA
+- DESC:add patch for shenwei architecture
+
 * Sat Nov 26 2022 zhouyihang <zhouyihang3@h-partners.com> - 34.1-2
 - Type:bugfix
 - ID:NA
