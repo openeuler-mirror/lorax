@@ -27,7 +27,6 @@ Patch11:	backport-Do-not-use-loglevel-option-when-running-Anaconda.patch
 Patch12:	backport-Improve-lmc-no-virt-error-handling.patch
 Patch13:	backport-Add-POSTIN-scriptlet-error-to-the-log-monitor-list.patch
 Patch14:	backport-Remove-LD_PRELOAD-libgomp.so.1-from-lmc-no-virt.patch
-Patch15:        backport-runtime-install-don-t-install-notification-daemon.patch
 Patch16:        add-param-name_prefix-to-make-name-used-by-register_blueprint-unique.patch
 Patch100:	0001-support-loongarch-for-lorax.patch
 
@@ -144,7 +143,6 @@ build images, etc. from the command line.
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
-%patch15 -p1
 %patch16 -p1
 %ifarch loongarch64
 %patch100 -p1
