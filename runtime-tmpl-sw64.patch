@@ -1,0 +1,127 @@
+--- ./share/templates.d/99-generic/runtime-install.tmpl.orig	2022-11-02 01:51:10.114315928 +0000
++++ ./share/templates.d/99-generic/runtime-install.tmpl	2022-11-02 01:59:02.845221968 +0000
+@@ -5,7 +5,7 @@
+ installpkg anaconda anaconda-widgets kexec-tools-anaconda-addon anaconda-install-env-deps
+ ## Other available payloads
+ installpkg dnf
+-installpkg rpm-ostree ostree
++installpkg rpm
+ ## speed up compression on multicore systems
+ installpkg pigz
+ 
+@@ -129,7 +129,7 @@
+ installpkg pciutils usbutils ipmitool
+ installpkg mt-st smartmontools
+ installpkg hdparm
+-%if basearch not in ("aarch64", "ppc64le", "s390x"):
++%if basearch not in ("aarch64", "ppc64le", "s390x", "sw_64"):
+ installpkg pcmciautils
+ %endif
+ ## see bug #1483278
+@@ -143,24 +143,24 @@
+ 
+ 
+ ## fonts & themes
+-installpkg aajohan-comfortaa-fonts
++#installpkg aajohan-comfortaa-fonts
+ installpkg abattis-cantarell-fonts
+-installpkg bitmap-fangsongti-fonts
++#installpkg bitmap-fangsongti-fonts
+ installpkg dejavu-sans-fonts dejavu-sans-mono-fonts
+ installpkg google-noto-sans-cjk-ttc-fonts
+-installpkg google-noto-sans-gurmukhi-fonts
+-installpkg google-noto-sans-sinhala-vf-fonts
++#installpkg google-noto-sans-gurmukhi-fonts
++#installpkg google-noto-sans-sinhala-vf-fonts
+ installpkg jomolhari-fonts
+-installpkg khmeros-base-fonts
+-installpkg lohit-assamese-fonts
+-installpkg lohit-bengali-fonts
+-installpkg lohit-devanagari-fonts
+-installpkg lohit-gujarati-fonts
+-installpkg lohit-kannada-fonts
+-installpkg lohit-marathi-fonts
+-installpkg lohit-odia-fonts
+-installpkg lohit-tamil-fonts
+-installpkg lohit-telugu-fonts
++#installpkg khmeros-base-fonts
++#installpkg lohit-assamese-fonts
++#installpkg lohit-bengali-fonts
++#installpkg lohit-devanagari-fonts
++#installpkg lohit-gujarati-fonts
++#installpkg lohit-kannada-fonts
++#installpkg lohit-marathi-fonts
++#installpkg lohit-odia-fonts
++#installpkg lohit-tamil-fonts
++#installpkg lohit-telugu-fonts
+ installpkg madan-fonts
+ installpkg paktype-naskh-basic-fonts
+ installpkg sil-abyssinica-fonts
+@@ -171,13 +171,13 @@
+ installpkg xorg-x11-fonts-misc
+ 
+ ## debugging/bug reporting tools
+-installpkg gdb-gdbserver
+-installpkg libreport-plugin-bugzilla libreport-plugin-reportuploader
++#installpkg gdb-gdbserver
++#installpkg libreport-plugin-bugzilla libreport-plugin-reportuploader
+ installpkg fpaste
+ installpkg python3-pyatspi
+ 
+ ## extra tools not required by anaconda
+-installpkg vim-minimal strace lsof dump xz less
++installpkg vim-minimal strace lsof xz less
+ installpkg wget rsync bind-utils ftp mtr vconfig
+ installpkg icfg spice-vdagent
+ installpkg gdisk hexedit sg3_utils
+--- ./share/templates.d/99-generic/runtime-cleanup.tmpl.orig	2022-11-02 01:50:59.214295037 +0000
++++ ./share/templates.d/99-generic/runtime-cleanup.tmpl	2022-11-02 01:53:06.014538063 +0000
+@@ -43,7 +43,7 @@
+ ## Miscellanous unnecessary gpg program
+ removepkg pinentry
+ ## no storage device monitoring
+-removepkg device-mapper-event dmraid-events sgpio
++## removepkg device-mapper-event dmraid-events sgpio
+ ## logrotate isn't useful in anaconda
+ removepkg logrotate
+ remove /etc/logrotate.d
+@@ -76,12 +76,18 @@
+ remove /usr/share/mime/video /usr/share/mime/x-content /usr/share/mime/x-epoc
+ remove /var/db /var/games /var/tmp /var/yp /var/nis /var/opt /var/local
+ remove /var/mail /var/spool /var/preserve /var/report
+-remove /var/lib/rpm/* /var/lib/yum /var/lib/dnf
++## remove /var/lib/rpm/* /var/lib/yum /var/lib/dnf
+ ## clean up the files created by various '> /dev/null's
+ remove /dev/*
+ 
+ ## icons cache
+ remove /usr/share/icons/*/icon-theme.cache
++remove /usr/lib/fontconfig/cache/*
++remove /lib/fontconfig/cache/*
++remove /var/lib/systemd/catalog/database
++remove /var/cache/ldconfig/aux-cache
++remove /var/log/tallylog
++remove /root/lorax-packages.log rebuildfile/rootfs/root/lorax-packages.log
+ 
+ ## clean up kernel modules
+ removekmod sound drivers/media drivers/hwmon \
+@@ -132,7 +138,7 @@
+ removefrom authconfig /usr/sbin/* /usr/share/*
+ removefrom bash /etc/* /usr/bin/bashbug* /usr/share/*
+ removefrom bind-utils /usr/bin/host /usr/bin/nsupdate
+-removefrom bitmap-fangsongti-fonts /usr/share/fonts/*
++## removefrom bitmap-fangsongti-fonts /usr/share/fonts/*
+ removefrom ca-certificates /etc/pki/java/*
+ removefrom ca-certificates /etc/pki/tls/certs/ca-bundle.trust.crt /etc/ssl/*
+ removefrom cairo /usr/${libdir}/libcairo-script* /usr/bin/cairo-sphinx
+--- ./share/templates.d/99-generic/runtime-install.tmpl.orig	2022-11-02 02:22:32.247923239 +0000
++++ ./share/templates.d/99-generic/runtime-install.tmpl	2022-11-02 02:22:50.307957853 +0000
+@@ -105,7 +105,7 @@
+ 
+ ## extra storage packages
+ # hostname is needed for iscsi to work, see RHBZ#1593917
+-installpkg udisks2 udisks2-iscsi hostname
++installpkg udisks2 hostname
+ 
+ ## extra libblockdev plugins
+ installpkg libblockdev-lvm-dbus

@@ -1,0 +1,804 @@
+From 14fefba9691639c7909aa748b9d29f72b0b4cf83 Mon Sep 17 00:00:00 2001
+From: isoft <wenjuan.qiu@i-soft.com.cn>
+Date: Fri, 28 Oct 2022 02:43:32 +0000
+Subject: [PATCH 1/2] sw64 modify
+
+---
+ .../99-generic/config_files/sw64/boot.msg     |   5 +
+ .../99-generic/config_files/sw64/grub.conf    |  13 ++
+ .../config_files/sw64/grub2-efi.cfg           |  40 ++++++
+ .../99-generic/config_files/sw64/isolinux.cfg | 120 ++++++++++++++++
+ .../live/config_files/sw64/boot.msg           |   5 +
+ .../live/config_files/sw64/grub.conf          |  13 ++
+ .../live/config_files/sw64/grub2-efi.cfg      |  36 +++++
+ .../live/config_files/sw64/isolinux.cfg       | 110 ++++++++++++++
+ share/templates.d/99-generic/live/sw64.tmpl   | 126 ++++++++++++++++
+ share/templates.d/99-generic/sw64.tmpl        | 135 ++++++++++++++++++
+ src/pylorax/__init__.py                       |   6 +-
+ src/pylorax/creator.py                        |  13 +-
+ src/pylorax/mount.py                          |   2 +-
+ src/pylorax/treebuilder.py                    |   1 +
+ 14 files changed, 614 insertions(+), 11 deletions(-)
+ create mode 100644 share/templates.d/99-generic/config_files/sw64/boot.msg
+ create mode 100644 share/templates.d/99-generic/config_files/sw64/grub.conf
+ create mode 100644 share/templates.d/99-generic/config_files/sw64/grub2-efi.cfg
+ create mode 100644 share/templates.d/99-generic/config_files/sw64/isolinux.cfg
+ create mode 100644 share/templates.d/99-generic/live/config_files/sw64/boot.msg
+ create mode 100644 share/templates.d/99-generic/live/config_files/sw64/grub.conf
+ create mode 100644 share/templates.d/99-generic/live/config_files/sw64/grub2-efi.cfg
+ create mode 100644 share/templates.d/99-generic/live/config_files/sw64/isolinux.cfg
+ create mode 100644 share/templates.d/99-generic/live/sw64.tmpl
+ create mode 100644 share/templates.d/99-generic/sw64.tmpl
+
+diff --git a/share/templates.d/99-generic/config_files/sw64/boot.msg b/share/templates.d/99-generic/config_files/sw64/boot.msg
+new file mode 100644
+index 0000000..ff54899
+--- /dev/null
++++ b/share/templates.d/99-generic/config_files/sw64/boot.msg
+@@ -0,0 +1,5 @@
++ 
++splash.lss
++
++ -  Press the 01<ENTER>07 key to begin the installation process.
++
+diff --git a/share/templates.d/99-generic/config_files/sw64/grub.conf b/share/templates.d/99-generic/config_files/sw64/grub.conf
+new file mode 100644
+index 0000000..4cf8ced
+--- /dev/null
++++ b/share/templates.d/99-generic/config_files/sw64/grub.conf
+@@ -0,0 +1,13 @@
++#debug --graphics
++default=1
++splashimage=@SPLASHPATH@
++timeout 60
++hiddenmenu
++title Install @PRODUCT@ @VERSION@
++	findiso
++	kernel @KERNELPATH@ @ROOT@ quiet
++	initrd @INITRDPATH@
++title Test this media & install @PRODUCT@ @VERSION@
++	findiso
++	kernel @KERNELPATH@ @ROOT@ rd.live.check quiet
++	initrd @INITRDPATH@
+diff --git a/share/templates.d/99-generic/config_files/sw64/grub2-efi.cfg b/share/templates.d/99-generic/config_files/sw64/grub2-efi.cfg
+new file mode 100644
+index 0000000..951fb54
+--- /dev/null
++++ b/share/templates.d/99-generic/config_files/sw64/grub2-efi.cfg
+@@ -0,0 +1,40 @@
++set default="1"
++
++function load_video {
++  insmod efi_gop
++  insmod efi_uga
++  insmod video_bochs
++  insmod video_cirrus
++  insmod all_video
++}
++
++load_video
++set gfxpayload=keep
++insmod gzio
++insmod part_gpt
++insmod ext2
++
++set timeout=60
++### END /etc/grub.d/00_header ###
++
++search --no-floppy --set=root -l '@ISOLABEL@'
++
++### BEGIN /etc/grub.d/10_linux ###
++menuentry 'Install @PRODUCT@ @VERSION@' --class fedora --class gnu-linux --class gnu --class os {
++	linuxefi @KERNELPATH@ @ROOT@ quiet
++	initrdefi @INITRDPATH@
++}
++menuentry 'Test this media & install @PRODUCT@ @VERSION@' --class fedora --class gnu-linux --class gnu --class os {
++	linuxefi @KERNELPATH@ @ROOT@ rd.live.check quiet
++	initrdefi @INITRDPATH@
++}
++submenu 'Troubleshooting -->' {
++	menuentry 'Install @PRODUCT@ @VERSION@ in basic graphics mode' --class fedora --class gnu-linux --class gnu --class os {
++		linuxefi @KERNELPATH@ @ROOT@ nomodeset quiet
++		initrdefi @INITRDPATH@
++	}
++	menuentry 'Rescue a @PRODUCT@ system' --class fedora --class gnu-linux --class gnu --class os {
++		linuxefi @KERNELPATH@ @ROOT@ rescue quiet
++		initrdefi @INITRDPATH@
++	}
++}
+diff --git a/share/templates.d/99-generic/config_files/sw64/isolinux.cfg b/share/templates.d/99-generic/config_files/sw64/isolinux.cfg
+new file mode 100644
+index 0000000..0471f42
+--- /dev/null
++++ b/share/templates.d/99-generic/config_files/sw64/isolinux.cfg
+@@ -0,0 +1,120 @@
++default vesamenu.c32
++timeout 600
++
++display boot.msg
++
++# Clear the screen when exiting the menu, instead of leaving the menu displayed.
++# For vesamenu, this means the graphical background is still displayed without
++# the menu itself for as long as the screen remains in graphics mode.
++menu clear
++menu background splash.png
++menu title @PRODUCT@ @VERSION@
++menu vshift 8
++menu rows 18
++menu margin 8
++#menu hidden
++menu helpmsgrow 15
++menu tabmsgrow 13
++
++# Border Area
++menu color border * #00000000 #00000000 none
++
++# Selected item
++menu color sel 0 #ffffffff #00000000 none
++
++# Title bar
++menu color title 0 #ff7ba3d0 #00000000 none
++
++# Press [Tab] message
++menu color tabmsg 0 #ff3a6496 #00000000 none
++
++# Unselected menu item
++menu color unsel 0 #84b8ffff #00000000 none
++
++# Selected hotkey
++menu color hotsel 0 #84b8ffff #00000000 none
++
++# Unselected hotkey
++menu color hotkey 0 #ffffffff #00000000 none
++
++# Help text
++menu color help 0 #ffffffff #00000000 none
++
++# A scrollbar of some type? Not sure.
++menu color scrollbar 0 #ffffffff #ff355594 none
++
++# Timeout msg
++menu color timeout 0 #ffffffff #00000000 none
++menu color timeout_msg 0 #ffffffff #00000000 none
++
++# Command prompt text
++menu color cmdmark 0 #84b8ffff #00000000 none
++menu color cmdline 0 #ffffffff #00000000 none
++
++# Do not display the actual menu unless the user presses a key. All that is displayed is a timeout message.
++
++menu tabmsg Press Tab for full configuration options on menu items.
++
++menu separator # insert an empty line
++menu separator # insert an empty line
++
++label linux
++  menu label ^Install @PRODUCT@ @VERSION@
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ quiet
++
++label check
++  menu label Test this ^media & install @PRODUCT@ @VERSION@
++  menu default
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ rd.live.check quiet
++
++menu separator # insert an empty line
++
++# utilities submenu
++menu begin ^Troubleshooting
++  menu title Troubleshooting
++
++label vesa
++  menu indent count 5
++  menu label Install @PRODUCT@ @VERSION@ in ^basic graphics mode
++  text help
++	Try this option out if you're having trouble installing
++	@PRODUCT@ @VERSION@.
++  endtext
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ nomodeset quiet
++
++label rescue
++  menu indent count 5
++  menu label ^Rescue a @PRODUCT@ system
++  text help
++	If the system will not boot, this lets you access files
++	and edit config files to try to get it booting again.
++  endtext
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ rescue quiet
++
++label memtest
++  menu label Run a ^memory test
++  text help
++	If your system is having issues, a problem with your
++	system's memory may be the cause. Use this utility to
++	see if the memory is working correctly.
++  endtext
++  kernel memtest
++
++menu separator # insert an empty line
++
++label local
++  menu label Boot from ^local drive
++  localboot 0xffff
++
++menu separator # insert an empty line
++menu separator # insert an empty line
++
++label returntomain
++  menu label Return to ^main menu
++  menu exit
++
++menu end
+diff --git a/share/templates.d/99-generic/live/config_files/sw64/boot.msg b/share/templates.d/99-generic/live/config_files/sw64/boot.msg
+new file mode 100644
+index 0000000..ff54899
+--- /dev/null
++++ b/share/templates.d/99-generic/live/config_files/sw64/boot.msg
+@@ -0,0 +1,5 @@
++ 
++splash.lss
++
++ -  Press the 01<ENTER>07 key to begin the installation process.
++
+diff --git a/share/templates.d/99-generic/live/config_files/sw64/grub.conf b/share/templates.d/99-generic/live/config_files/sw64/grub.conf
+new file mode 100644
+index 0000000..6c4a51f
+--- /dev/null
++++ b/share/templates.d/99-generic/live/config_files/sw64/grub.conf
+@@ -0,0 +1,13 @@
++#debug --graphics
++default=1
++splashimage=@SPLASHPATH@
++timeout 60
++hiddenmenu
++title Start @PRODUCT@ @VERSION@
++	findiso
++	kernel @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image quiet
++	initrd @INITRDPATH@
++title Test this media & start @PRODUCT@ @VERSION@
++	findiso
++	kernel @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image rd.live.check quiet
++	initrd @INITRDPATH@
+diff --git a/share/templates.d/99-generic/live/config_files/sw64/grub2-efi.cfg b/share/templates.d/99-generic/live/config_files/sw64/grub2-efi.cfg
+new file mode 100644
+index 0000000..2e24b15
+--- /dev/null
++++ b/share/templates.d/99-generic/live/config_files/sw64/grub2-efi.cfg
+@@ -0,0 +1,36 @@
++set default="1"
++
++function load_video {
++  insmod efi_gop
++  insmod efi_uga
++  insmod video_bochs
++  insmod video_cirrus
++  insmod all_video
++}
++
++load_video
++set gfxpayload=keep
++insmod gzio
++insmod part_gpt
++insmod ext2
++
++set timeout=60
++### END /etc/grub.d/00_header ###
++
++search --no-floppy --set=root -l '@ISOLABEL@'
++
++### BEGIN /etc/grub.d/10_linux ###
++menuentry 'Start @PRODUCT@ @VERSION@' --class fedora --class gnu-linux --class gnu --class os {
++	linuxefi @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image quiet
++	initrdefi @INITRDPATH@
++}
++menuentry 'Test this media & start @PRODUCT@ @VERSION@' --class fedora --class gnu-linux --class gnu --class os {
++	linuxefi @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image rd.live.check quiet
++	initrdefi @INITRDPATH@
++}
++submenu 'Troubleshooting -->' {
++	menuentry 'Start @PRODUCT@ @VERSION@ in basic graphics mode' --class fedora --class gnu-linux --class gnu --class os {
++		linuxefi @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image nomodeset quiet
++		initrdefi @INITRDPATH@
++	}
++}
+diff --git a/share/templates.d/99-generic/live/config_files/sw64/isolinux.cfg b/share/templates.d/99-generic/live/config_files/sw64/isolinux.cfg
+new file mode 100644
+index 0000000..bc36bb9
+--- /dev/null
++++ b/share/templates.d/99-generic/live/config_files/sw64/isolinux.cfg
+@@ -0,0 +1,110 @@
++default vesamenu.c32
++timeout 600
++
++display boot.msg
++
++# Clear the screen when exiting the menu, instead of leaving the menu displayed.
++# For vesamenu, this means the graphical background is still displayed without
++# the menu itself for as long as the screen remains in graphics mode.
++menu clear
++menu background splash.png
++menu title @PRODUCT@ @VERSION@
++menu vshift 8
++menu rows 18
++menu margin 8
++#menu hidden
++menu helpmsgrow 15
++menu tabmsgrow 13
++
++# Border Area
++menu color border * #00000000 #00000000 none
++
++# Selected item
++menu color sel 0 #ffffffff #00000000 none
++
++# Title bar
++menu color title 0 #ff7ba3d0 #00000000 none
++
++# Press [Tab] message
++menu color tabmsg 0 #ff3a6496 #00000000 none
++
++# Unselected menu item
++menu color unsel 0 #84b8ffff #00000000 none
++
++# Selected hotkey
++menu color hotsel 0 #84b8ffff #00000000 none
++
++# Unselected hotkey
++menu color hotkey 0 #ffffffff #00000000 none
++
++# Help text
++menu color help 0 #ffffffff #00000000 none
++
++# A scrollbar of some type? Not sure.
++menu color scrollbar 0 #ffffffff #ff355594 none
++
++# Timeout msg
++menu color timeout 0 #ffffffff #00000000 none
++menu color timeout_msg 0 #ffffffff #00000000 none
++
++# Command prompt text
++menu color cmdmark 0 #84b8ffff #00000000 none
++menu color cmdline 0 #ffffffff #00000000 none
++
++# Do not display the actual menu unless the user presses a key. All that is displayed is a timeout message.
++
++menu tabmsg Press Tab for full configuration options on menu items.
++
++menu separator # insert an empty line
++menu separator # insert an empty line
++
++label linux
++  menu label ^Start @PRODUCT@ @VERSION@
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ @EXTRA@ rd.live.image quiet
++
++label check
++  menu label Test this ^media & start @PRODUCT@ @VERSION@
++  menu default
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ @EXTRA@ rd.live.image rd.live.check quiet
++
++menu separator # insert an empty line
++
++# utilities submenu
++menu begin ^Troubleshooting
++  menu title Troubleshooting
++
++label vesa
++  menu indent count 5
++  menu label Start @PRODUCT@ @VERSION@ in ^basic graphics mode
++  text help
++	Try this option out if you're having trouble starting
++	@PRODUCT@ @VERSION@.
++  endtext
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ @EXTRA@ rd.live.image nomodeset quiet
++
++label memtest
++  menu label Run a ^memory test
++  text help
++	If your system is having issues, a problem with your
++	system's memory may be the cause. Use this utility to
++	see if the memory is working correctly.
++  endtext
++  kernel memtest
++
++menu separator # insert an empty line
++
++label local
++  menu label Boot from ^local drive
++  localboot 0xffff
++
++menu separator # insert an empty line
++menu separator # insert an empty line
++
++label returntomain
++  menu label Return to ^main menu
++  menu exit
++
++menu end
+diff --git a/share/templates.d/99-generic/live/sw64.tmpl b/share/templates.d/99-generic/live/sw64.tmpl
+new file mode 100644
+index 0000000..4173c0c
+--- /dev/null
++++ b/share/templates.d/99-generic/live/sw64.tmpl
+@@ -0,0 +1,126 @@
++<%page args="kernels, runtime_img, basearch, inroot, outroot, product, isolabel, extra_boot_args"/>
++<%
++configdir="tmp/config_files/sw64"
++SYSLINUXDIR="usr/share/syslinux"
++PXEBOOTDIR="pxeboot"
++BOOTDIR="isolinux"
++KERNELDIR=PXEBOOTDIR
++LIVEDIR="LiveOS"
++LORAXDIR="usr/share/lorax/"
++
++## Don't allow spaces or escape characters in the iso label
++def valid_label(ch):
++    return ch.isalnum() or ch == '_'
++
++isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
++
++import os
++from os.path import basename
++from pylorax.sysutils import joinpaths
++
++# Test the runtime_img, if it is > 4GiB we need to set -iso-level to 3
++if os.stat(joinpaths(inroot, runtime_img)).st_size >= 4*1024**3:
++    isoargs = "-iso-level 3"
++else:
++    isoargs = ""
++%>
++
++mkdir ${LIVEDIR}
++install ${runtime_img} ${LIVEDIR}/squashfs.img
++treeinfo stage2 mainimage ${LIVEDIR}/squashfs.img
++
++## install bootloader and config files
++mkdir ${BOOTDIR}
++install ${SYSLINUXDIR}/isolinux.bin ${BOOTDIR}
++install ${SYSLINUXDIR}/vesamenu.c32 ${BOOTDIR}
++install ${SYSLINUXDIR}/ldlinux.c32 ${BOOTDIR}
++install ${SYSLINUXDIR}/libcom32.c32 ${BOOTDIR}
++install ${SYSLINUXDIR}/libutil.c32 ${BOOTDIR}
++install ${configdir}/isolinux.cfg ${BOOTDIR}
++install ${configdir}/boot.msg ${BOOTDIR}
++install ${configdir}/grub.conf ${BOOTDIR}
++install usr/share/anaconda/boot/syslinux-splash.png ${BOOTDIR}/splash.png
++install boot/memtest* ${BOOTDIR}/memtest
++
++## configure bootloader
++replace @VERSION@ ${product.version} ${BOOTDIR}/grub.conf ${BOOTDIR}/isolinux.cfg ${BOOTDIR}/*.msg
++replace @PRODUCT@ '${product.name}'  ${BOOTDIR}/grub.conf ${BOOTDIR}/isolinux.cfg ${BOOTDIR}/*.msg
++replace @ROOT@ 'root=live:CDLABEL=${isolabel|udev}' ${BOOTDIR}/isolinux.cfg
++replace @EXTRA@ '${extra_boot_args}' ${BOOTDIR}/isolinux.cfg
++
++## install kernels
++mkdir ${KERNELDIR}
++%for kernel in kernels:
++    %if kernel.flavor:
++        installkernel images-xen ${kernel.path} ${KERNELDIR}/vmlinuz-${kernel.flavor}
++        installinitrd images-xen ${kernel.initrd.path} ${KERNELDIR}/initrd-${kernel.flavor}.img
++    %else:
++        installkernel images-${basearch} ${kernel.path} ${KERNELDIR}/vmlinuz
++        installinitrd images-${basearch} ${kernel.initrd.path} ${KERNELDIR}/initrd.img
++    %endif
++%endfor
++
++hardlink ${KERNELDIR}/vmlinuz ${BOOTDIR}
++hardlink ${KERNELDIR}/initrd.img ${BOOTDIR}
++%if basearch == 'x86_64':
++    treeinfo images-xen kernel ${KERNELDIR}/vmlinuz
++    treeinfo images-xen initrd ${KERNELDIR}/initrd.img
++%endif
++
++## WHeeeeeeee, EFI.
++<% efiargs=""; efigraft=""; efiarch32=None; efiarch64=None %>
++%if exists("boot/efi/EFI/*/gcdia32.efi"):
++    <% efiarch32 = 'IA32' %>
++%endif
++%if exists("boot/efi/EFI/*/gcdx64.efi"):
++    <% efiarch64 = 'X64' %>
++%endif
++%if (efiarch32 or efiarch64) and basearch != 'i386':
++    <%
++    efigraft="EFI/BOOT={0}/EFI/BOOT".format(outroot)
++    images = [("images/efiboot.img", "-isohybrid-gpt-basdat")]
++    if domacboot:
++        images.append(("images/macboot.img", "-isohybrid-gpt-hfsplus"))
++    %>
++    %for img, hybrid in images:
++        <%
++        efiargs += " -eltorito-alt-boot -e {0} -no-emul-boot {1}".format(img, hybrid)
++        efigraft += " {0}={1}/{0}".format(img,outroot)
++        %>
++        treeinfo images-${basearch} ${img|basename} ${img}
++    %endfor
++    <%include file="efi.tmpl" args="configdir=configdir, KERNELDIR=KERNELDIR, efiarch32=efiarch32, efiarch64=efiarch64, isolabel=isolabel, extra_boot_args=extra_boot_args"/>
++%endif
++
++# Create optional product.img and updates.img
++<% filegraft=""; images=["product", "updates"]; compressargs=""; %>
++%if basearch == 'i386':
++    # Limit the amount of memory xz uses on i386
++    <% compressargs="--xz -9 --memlimit-compress=3700MiB" %>
++%endif
++%for img in images:
++    %if exists("%s/%s/" % (LORAXDIR, img)):
++        installimg ${compressargs} ${LORAXDIR}/${img}/ images/${img}.img
++        treeinfo images-${basearch} ${img}.img images/${img}.img
++        <% filegraft += " images/{0}.img={1}/images/{0}.img".format(img, outroot) %>
++    %endif
++%endfor
++
++# Add the license files
++%for f in glob("/usr/share/licenses/*-release/*"):
++    install ${f} ${f|basename}
++    <% filegraft += " {0}={1}/{0}".format(basename(f), outroot) %>
++%endfor
++
++## make boot.iso
++runcmd xorrisofs ${isoargs} -o ${outroot}/images/boot.iso \
++       -isohybrid-mbr /usr/share/syslinux/isohdpfx.bin \
++       -b ${BOOTDIR}/isolinux.bin -c ${BOOTDIR}/boot.cat \
++       -boot-load-size 4 -boot-info-table -no-emul-boot \
++       ${efiargs} -R -J -V '${isolabel}' \
++       -graft-points \
++       ${BOOTDIR}=${outroot}/${BOOTDIR} \
++       ${KERNELDIR}=${outroot}/${KERNELDIR} \
++       ${LIVEDIR}=${outroot}/${LIVEDIR} \
++       ${efigraft} ${filegraft}
++treeinfo images-${basearch} boot.iso images/boot.iso
+diff --git a/share/templates.d/99-generic/sw64.tmpl b/share/templates.d/99-generic/sw64.tmpl
+new file mode 100644
+index 0000000..193286c
+--- /dev/null
++++ b/share/templates.d/99-generic/sw64.tmpl
+@@ -0,0 +1,135 @@
++<%page args="kernels, runtime_img, runtime_base, basearch, inroot, outroot, product, isolabel"/>
++<%
++configdir="tmp/config_files/sw64"
++SYSLINUXDIR="usr/share/syslinux"
++PXEBOOTDIR="pxeboot"
++STAGE2IMG="isoft/sw64/root-image.fs.sfs"
++BOOTDIR="isolinux"
++KERNELDIR=PXEBOOTDIR
++LORAXDIR="usr/share/lorax/"
++
++## Don't allow spaces or escape characters in the iso label
++def valid_label(ch):
++    return ch.isalnum() or ch == '_'
++
++isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
++
++import os
++from os.path import basename
++from pylorax.sysutils import joinpaths
++
++# Test the runtime_img, if it is > 4GiB we need to set -iso-level to 3
++if os.stat(joinpaths(inroot, runtime_img)).st_size >= 4*1024**3:
++    isoargs = "-iso-level 3"
++else:
++    isoargs = ""
++%>
++
++mkdir isoft/sw64
++install ${runtime_img} ${STAGE2IMG}
++treeinfo stage2 mainimage isoft/sw64/${runtime_base}
++
++## install bootloader and config files
++mkdir ${BOOTDIR}
++install ${SYSLINUXDIR}/isolinux.bin ${BOOTDIR}
++install ${SYSLINUXDIR}/vesamenu.c32 ${BOOTDIR}
++install ${SYSLINUXDIR}/ldlinux.c32 ${BOOTDIR}
++install ${SYSLINUXDIR}/libcom32.c32 ${BOOTDIR}
++install ${SYSLINUXDIR}/libutil.c32 ${BOOTDIR}
++install ${configdir}/isolinux.cfg ${BOOTDIR}
++install ${configdir}/boot.msg ${BOOTDIR}
++install ${configdir}/grub.conf ${BOOTDIR}
++install usr/share/anaconda/boot/syslinux-splash.png ${BOOTDIR}/splash.png
++install boot/memtest* ${BOOTDIR}/memtest
++
++## configure bootloader
++replace @VERSION@ ${product.version} ${BOOTDIR}/grub.conf ${BOOTDIR}/isolinux.cfg ${BOOTDIR}/*.msg
++replace @PRODUCT@ '${product.name}'  ${BOOTDIR}/grub.conf ${BOOTDIR}/isolinux.cfg ${BOOTDIR}/*.msg
++replace @ROOT@ 'inst.stage2=hd:LABEL=${isolabel|udev}' ${BOOTDIR}/isolinux.cfg
++
++## install kernels
++mkdir ${KERNELDIR}
++%for kernel in kernels:
++    %if kernel.flavor:
++        ## i386 PAE
++        installkernel images-xen ${kernel.path} ${KERNELDIR}/vmlinuz-${kernel.flavor}
++        installinitrd images-xen ${kernel.initrd.path} ${KERNELDIR}/initrd-${kernel.flavor}.img
++    %else:
++        ## normal i386, x86_64
++        installkernel images-${basearch} ${kernel.path} ${KERNELDIR}/vmlinuz
++        installinitrd images-${basearch} ${kernel.initrd.path} ${KERNELDIR}/initrd.img
++    %endif
++%endfor
++
++hardlink ${KERNELDIR}/vmlinuz ${BOOTDIR}
++hardlink ${KERNELDIR}/initrd.img ${BOOTDIR}
++%if basearch == 'x86_64':
++    treeinfo images-xen kernel ${KERNELDIR}/vmlinuz
++    treeinfo images-xen initrd ${KERNELDIR}/initrd.img
++%endif
++
++## WHeeeeeeee, EFI.
++<% efiargs=""; efigraft=""; efiarch32=None; efiarch64=None %>
++%if exists("boot/efi/EFI/*/gcdia32.efi"):
++    <% efiarch32 = 'IA32' %>
++%endif
++%if exists("boot/efi/EFI/*/gcdx64.efi"):
++    <% efiarch64 = 'X64' %>
++%endif
++%if (efiarch32 or efiarch64) and basearch != 'i386':
++    <%
++    efigraft="EFI/BOOT={0}/EFI/BOOT".format(outroot)
++    images = [("images/efiboot.img", "-isohybrid-gpt-basdat")]
++    if domacboot:
++        images.append(("images/macboot.img", "-isohybrid-gpt-hfsplus"))
++    %>
++    %for img, hybrid in images:
++        <%
++        efiargs += " -eltorito-alt-boot -e {0} -no-emul-boot {1}".format(img, hybrid)
++        efigraft += " {0}={1}/{0}".format(img,outroot)
++        %>
++        treeinfo images-${basearch} ${img|basename} ${img}
++    %endfor
++    <%include file="efi.tmpl" args="configdir=configdir, KERNELDIR=KERNELDIR, efiarch32=efiarch32, efiarch64=efiarch64, isolabel=isolabel"/>
++%endif
++
++# Create optional product.img and updates.img
++<% filegraft=""; images=["product", "updates"]; compressargs=""; %>
++%if basearch == 'i386':
++    # Limit the amount of memory xz uses on i386
++    <% compressargs="--xz -9 --memlimit-compress=3700MiB" %>
++%endif
++%for img in images:
++    %if exists("%s/%s/" % (LORAXDIR, img)):
++        installimg ${compressargs} ${LORAXDIR}/${img}/ isoft/sw64/${img}.img
++        treeinfo images-${basearch} ${img}.img isoft/sw64/${img}.img
++        <% filegraft += " images/{0}.img={1}/isoft/sw64/{0}.img".format(img, outroot) %>
++    %endif
++%endfor
++
++# Inherit iso-graft/ if it exists from external templates
++<%
++    import os
++    if os.path.exists(workdir + "/iso-graft"):
++        filegraft += " " + workdir + "/iso-graft"
++%>
++
++# Add the license files
++%for f in glob("/usr/share/licenses/*-release/*"):
++    install ${f} ${f|basename}
++    <% filegraft += " {0}={1}/{0}".format(basename(f), outroot) %>
++%endfor
++
++## make boot.iso
++runcmd xorrisofs ${isoargs} -o ${outroot}/images/boot.iso \
++       -isohybrid-mbr /usr/share/syslinux/isohdpfx.bin \
++       -b ${BOOTDIR}/isolinux.bin -c ${BOOTDIR}/boot.cat \
++       -boot-load-size 4 -boot-info-table -no-emul-boot \
++       ${efiargs} -R -J -V '${isolabel}' \
++       -graft-points \
++       .discinfo=${outroot}/.discinfo \
++       ${STAGE2IMG}=${outroot}/${STAGE2IMG} \
++       ${BOOTDIR}=${outroot}/${BOOTDIR} \
++       ${KERNELDIR}=${outroot}/${KERNELDIR} \
++       ${efigraft} ${filegraft}
++treeinfo images-${basearch} boot.iso images/boot.iso
+diff --git a/src/pylorax/__init__.py b/src/pylorax/__init__.py
+index 8700ff5..1b85052 100644
+--- a/src/pylorax/__init__.py
++++ b/src/pylorax/__init__.py
+@@ -61,13 +61,13 @@ else:
+ DRACUT_DEFAULT = ["--xz", "--install", "/.buildstamp", "--no-early-microcode", "--add", "fips"]
+ 
+ # Used for DNF conf.module_platform_id
+-DEFAULT_PLATFORM_ID = "platform:f32"
++DEFAULT_PLATFORM_ID = "platform:sw64"
+ 
+ class ArchData(DataHolder):
+     lib64_arches = ("x86_64", "ppc64le", "s390x", "ia64", "aarch64")
+     bcj_arch = dict(i386="x86", x86_64="x86",
+                     ppc64le="powerpc",
+-                    arm="arm", armhfp="arm")
++                    arm="arm", armhfp="arm", sw_64="sw64")
+ 
+     def __init__(self, buildarch):
+         super(ArchData, self).__init__()
+@@ -309,7 +309,7 @@ class Lorax(BaseLoraxClass):
+             rb.writepkgsizes(joinpaths(logdir, "final-pkgsizes.txt"))
+ 
+         logger.info("creating the runtime image")
+-        runtime = "images/install.img"
++        runtime = "isoft/sw64/root-image.fs.sfs"
+         compression = self.conf.get("compression", "type")
+         compressargs = self.conf.get("compression", "args").split()     # pylint: disable=no-member
+         if self.conf.getboolean("compression", "bcj"):
+diff --git a/src/pylorax/creator.py b/src/pylorax/creator.py
+index 7075d32..79d35fd 100644
+--- a/src/pylorax/creator.py
++++ b/src/pylorax/creator.py
+@@ -51,7 +51,7 @@ from pylorax.sysutils import joinpaths, remove
+ DRACUT_DEFAULT = ["--xz", "--add", "livenet dmsquash-live dmsquash-live-ntfs convertfs pollcdrom qemu qemu-net",
+                   "--omit", "plymouth", "--no-hostonly", "--debug", "--no-early-microcode"]
+ 
+-RUNTIME = "images/install.img"
++RUNTIME = "isoft/sw64/root-image.fs.sfs"
+ 
+ class FakeDNF(object):
+     """
+@@ -336,7 +336,7 @@ def make_livecd(opts, mount_dir, work_dir):
+     :param opts: options passed to livemedia-creator
+     :type opts: argparse options
+     :param str mount_dir: Directory tree to compress
+-    :param str work_dir: Output compressed image to work_dir+images/install.img
++    :param str work_dir: Output compressed image to work_dir+isoft/sw64/root-image.fs.sfs
+ 
+     This uses wwood's squashfs live initramfs method:
+      * put the real / into LiveOS/rootfs.img
+@@ -354,7 +354,7 @@ def make_livecd(opts, mount_dir, work_dir):
+     # Link /images to work_dir/images to make the templates happy
+     if os.path.islink(joinpaths(mount_dir, "images")):
+         os.unlink(joinpaths(mount_dir, "images"))
+-    rc = execWithRedirect("/bin/ln", ["-s", joinpaths(work_dir, "images"),
++    rc = execWithRedirect("/bin/ln", ["-s", joinpaths(work_dir, "isoft/sw64"),
+                                      joinpaths(mount_dir, "images")])
+     if rc:
+         raise RuntimeError("Failed to symlink images from mount_dir to work_dir")
+@@ -529,9 +529,8 @@ def make_live_images(opts, work_dir, disk_img):
+     sys_root = ""
+ 
+     squashfs_root_dir = joinpaths(work_dir, "squashfs_root")
+-    liveos_dir = joinpaths(squashfs_root_dir, "LiveOS")
+-    os.makedirs(liveos_dir)
+-    rootfs_img = joinpaths(liveos_dir, "rootfs.img")
++    os.makedirs(squashfs_root_dir)
++    rootfs_img = joinpaths(squashfs_root_dir, "root-image.fs")
+ 
+     if opts.fs_image or opts.no_virt:
+         # Find the ostree root in the fsimage
+@@ -573,7 +572,7 @@ def make_live_images(opts, work_dir, disk_img):
+ 
+     log.info("Packing live rootfs image")
+     add_pxe_args = []
+-    live_image_name = "live-rootfs.squashfs.img"
++    live_image_name = "root-image.fs.sfs"
+     compression, compressargs = squashfs_args(opts)
+     rc = mksquashfs(squashfs_root_dir, joinpaths(work_dir, live_image_name), compression, compressargs)
+     if rc != 0:
+diff --git a/src/pylorax/mount.py b/src/pylorax/mount.py
+index 19e399b..a50f5a9 100644
+--- a/src/pylorax/mount.py
++++ b/src/pylorax/mount.py
+@@ -67,7 +67,7 @@ class IsoMountpoint(object):
+         else:
+             self.repo = None
+         self.stage2 = os.path.exists(self.mount_dir+"/LiveOS/squashfs.img") or \
+-                      os.path.exists(self.mount_dir+"/images/install.img")
++                      os.path.exists(self.mount_dir+"/isoft/sw64/root-image.fs.sfs")
+ 
+         try:
+             for kernel, initrd in kernel_list:
+diff --git a/src/pylorax/treebuilder.py b/src/pylorax/treebuilder.py
+index cbb8872..9335735 100644
+--- a/src/pylorax/treebuilder.py
++++ b/src/pylorax/treebuilder.py
+@@ -42,6 +42,7 @@ templatemap = {
+     'aarch64': 'aarch64.tmpl',
+     'arm':     'arm.tmpl',
+     'armhfp':  'arm.tmpl',
++    "sw_64":   'sw64.tmpl'
+ }
+ 
+ def generate_module_info(moddir, outfile=None):
+-- 
+2.33.0
+
