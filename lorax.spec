@@ -3,11 +3,14 @@
 
 Name:           lorax
 Version:        33.6
-Release:        9
+Release:        10
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
 Source0:        https://github.com/weldr/lorax/archive/%{name}-%{version}-1.tar.gz
+%ifarch sw_64
+Source1:        sw64.tar.gz
+%endif
 
 Patch0:		0001-ignore-the-dir-that-without-kernel-version.patch
 Patch1:		0001-add-text-mode-selection-menu-in-grub-configuration.patch
@@ -27,6 +30,9 @@ Patch14:	backport-Remove-LD_PRELOAD-libgomp.so.1-from-lmc-no-virt.patch
 Patch15:        backport-runtime-install-don-t-install-notification-daemon.patch
 Patch16:        add-param-name_prefix-to-make-name-used-by-register_blueprint-unique.patch
 Patch100:	0001-support-loongarch-for-lorax.patch
+%ifarch sw_64
+Patch200:        0001-add-sw64-architecture.patch
+%endif
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
 BuildRequires:  python3-pytest-mock python3-pocketlint python3-gevent
@@ -139,6 +145,10 @@ build images, etc. from the command line.
 %patch100 -p1
 %endif
 
+%ifarch sw_64
+%patch200 -p1
+%endif
+
 %build
 %make_build
 
@@ -149,6 +159,9 @@ for toml in example-http-server.toml example-development.toml example-atlas.toml
     cp ./tests/pylorax/blueprints/$toml %{buildroot}/var/lib/lorax/composer/blueprints/
 done
 
+%ifarch sw_64
+tar -zxvf %SOURCE1 -C %{buildroot}/%{_datadir}/lorax/templates.d/99-generic/config_files/
+%endif
 
 %pre composer
 getent group weldr >/dev/null 2>&1 || groupadd -r weldr >/dev/null 2>&1 || :
@@ -220,6 +233,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Wed Dec 21 2022 Wenjuan Qiu <wenjuan.qiu@i-soft.com.cn> - 33.6-10
+- Type:requirements
+- ID:NA
+- SUG:NA
+- DESC:add sw_64 architecture support for lorax
+
 * Sat Nov 26 2022 zhouyihang <zhouyihang3@h-partners.com> - 33.6-9
 - Type:bugfix
 - ID:NA
