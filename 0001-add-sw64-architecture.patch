@@ -1,0 +1,521 @@
+diff -Naru lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/boot.msg lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/boot.msg
+--- lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/boot.msg	1970-01-01 08:00:00.000000000 +0800
++++ lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/boot.msg	2023-05-19 13:31:05.147962280 +0800
+@@ -0,0 +1,5 @@
++ 
++splash.lss
++
++ -  Press the 01<ENTER>07 key to begin the installation process.
++
+diff -Naru lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/grub2-efi.cfg lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/grub2-efi.cfg
+--- lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/grub2-efi.cfg	1970-01-01 08:00:00.000000000 +0800
++++ lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/grub2-efi.cfg	2023-05-19 13:31:05.147962280 +0800
+@@ -0,0 +1,36 @@
++set default="1"
++
++function load_video {
++  insmod efi_gop
++  insmod efi_uga
++  insmod video_bochs
++  insmod video_cirrus
++  insmod all_video
++}
++
++load_video
++set gfxpayload=keep
++insmod gzio
++insmod part_gpt
++insmod ext2
++
++set timeout=60
++### END /etc/grub.d/00_header ###
++
++search --no-floppy --set=root -l '@ISOLABEL@'
++
++### BEGIN /etc/grub.d/10_linux ###
++menuentry 'Start @PRODUCT@ @VERSION@' --class fedora --class gnu-linux --class gnu --class os {
++	linuxefi @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image quiet
++	initrdefi @INITRDPATH@
++}
++menuentry 'Test this media & start @PRODUCT@ @VERSION@' --class fedora --class gnu-linux --class gnu --class os {
++	linuxefi @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image rd.live.check quiet
++	initrdefi @INITRDPATH@
++}
++submenu 'Troubleshooting -->' {
++	menuentry 'Start @PRODUCT@ @VERSION@ in basic graphics mode' --class fedora --class gnu-linux --class gnu --class os {
++		linuxefi @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image nomodeset quiet
++		initrdefi @INITRDPATH@
++	}
++}
+diff -Naru lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/grub.conf lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/grub.conf
+--- lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/grub.conf	1970-01-01 08:00:00.000000000 +0800
++++ lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/grub.conf	2023-05-19 13:31:05.147962280 +0800
+@@ -0,0 +1,13 @@
++#debug --graphics
++default=1
++splashimage=@SPLASHPATH@
++timeout 60
++hiddenmenu
++title Start @PRODUCT@ @VERSION@
++	findiso
++	kernel @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image quiet
++	initrd @INITRDPATH@
++title Test this media & start @PRODUCT@ @VERSION@
++	findiso
++	kernel @KERNELPATH@ @ROOT@ @EXTRA@ rd.live.image rd.live.check quiet
++	initrd @INITRDPATH@
+diff -Naru lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/isolinux.cfg lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/isolinux.cfg
+--- lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/isolinux.cfg	1970-01-01 08:00:00.000000000 +0800
++++ lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/isolinux.cfg	2023-05-19 13:31:05.147962280 +0800
+@@ -0,0 +1,110 @@
++default vesamenu.c32
++timeout 600
++
++display boot.msg
++
++# Clear the screen when exiting the menu, instead of leaving the menu displayed.
++# For vesamenu, this means the graphical background is still displayed without
++# the menu itself for as long as the screen remains in graphics mode.
++menu clear
++menu background splash.png
++menu title @PRODUCT@ @VERSION@
++menu vshift 8
++menu rows 18
++menu margin 8
++#menu hidden
++menu helpmsgrow 15
++menu tabmsgrow 13
++
++# Border Area
++menu color border * #00000000 #00000000 none
++
++# Selected item
++menu color sel 0 #ffffffff #00000000 none
++
++# Title bar
++menu color title 0 #ff7ba3d0 #00000000 none
++
++# Press [Tab] message
++menu color tabmsg 0 #ff3a6496 #00000000 none
++
++# Unselected menu item
++menu color unsel 0 #84b8ffff #00000000 none
++
++# Selected hotkey
++menu color hotsel 0 #84b8ffff #00000000 none
++
++# Unselected hotkey
++menu color hotkey 0 #ffffffff #00000000 none
++
++# Help text
++menu color help 0 #ffffffff #00000000 none
++
++# A scrollbar of some type? Not sure.
++menu color scrollbar 0 #ffffffff #ff355594 none
++
++# Timeout msg
++menu color timeout 0 #ffffffff #00000000 none
++menu color timeout_msg 0 #ffffffff #00000000 none
++
++# Command prompt text
++menu color cmdmark 0 #84b8ffff #00000000 none
++menu color cmdline 0 #ffffffff #00000000 none
++
++# Do not display the actual menu unless the user presses a key. All that is displayed is a timeout message.
++
++menu tabmsg Press Tab for full configuration options on menu items.
++
++menu separator # insert an empty line
++menu separator # insert an empty line
++
++label linux
++  menu label ^Start @PRODUCT@ @VERSION@
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ @EXTRA@ rd.live.image quiet
++
++label check
++  menu label Test this ^media & start @PRODUCT@ @VERSION@
++  menu default
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ @EXTRA@ rd.live.image rd.live.check quiet
++
++menu separator # insert an empty line
++
++# utilities submenu
++menu begin ^Troubleshooting
++  menu title Troubleshooting
++
++label vesa
++  menu indent count 5
++  menu label Start @PRODUCT@ @VERSION@ in ^basic graphics mode
++  text help
++	Try this option out if you're having trouble starting
++	@PRODUCT@ @VERSION@.
++  endtext
++  kernel vmlinuz
++  append initrd=initrd.img @ROOT@ @EXTRA@ rd.live.image nomodeset quiet
++
++label memtest
++  menu label Run a ^memory test
++  text help
++	If your system is having issues, a problem with your
++	system's memory may be the cause. Use this utility to
++	see if the memory is working correctly.
++  endtext
++  kernel memtest
++
++menu separator # insert an empty line
++
++label local
++  menu label Boot from ^local drive
++  localboot 0xffff
++
++menu separator # insert an empty line
++menu separator # insert an empty line
++
++label returntomain
++  menu label Return to ^main menu
++  menu exit
++
++menu end
+diff -Naru lorax-lorax-34.1-1/share/templates.d/99-generic/runtime-cleanup.tmpl lorax-lorax-34.1-1.bak/share/templates.d/99-generic/runtime-cleanup.tmpl
+--- lorax-lorax-34.1-1/share/templates.d/99-generic/runtime-cleanup.tmpl	2020-09-15 05:55:20.000000000 +0800
++++ lorax-lorax-34.1-1.bak/share/templates.d/99-generic/runtime-cleanup.tmpl	2023-05-19 13:31:46.827962280 +0800
+@@ -38,7 +38,7 @@
+ removefrom initscripts /usr/sbin/* /usr/share/locale/* /usr/share/doc/* /usr/share/man/*
+ 
+ ## no storage device monitoring
+-removepkg device-mapper-event dmraid-events sgpio
++## removepkg device-mapper-event dmraid-events sgpio
+ ## logrotate isn't useful in anaconda
+ removepkg logrotate
+ remove /etc/logrotate.d
+@@ -71,12 +71,18 @@
+ remove /usr/share/mime/video /usr/share/mime/x-content /usr/share/mime/x-epoc
+ remove /var/db /var/games /var/tmp /var/yp /var/nis /var/opt /var/local
+ remove /var/mail /var/spool /var/preserve /var/report
+-remove /var/lib/rpm/* /var/lib/yum /var/lib/dnf
++## remove /var/lib/rpm/* /var/lib/yum /var/lib/dnf
+ ## clean up the files created by various '> /dev/null's
+ remove /dev/*
+ 
+ ## icons cache
+ remove /usr/share/icons/*/icon-theme.cache
++remove /usr/lib/fontconfig/cache/*
++remove /lib/fontconfig/cache/*
++remove /var/lib/systemd/catalog/database
++remove /var/cache/ldconfig/aux-cache
++remove /var/log/tallylog
++remove /root/lorax-packages.log rebuildfile/rootfs/root/lorax-packages.log
+ 
+ ## clean up kernel modules
+ removekmod sound drivers/media drivers/hwmon \
+@@ -122,7 +128,7 @@
+ removefrom audit-libs /etc/* /${libdir}/libauparse*
+ removefrom bash /etc/* /usr/bin/bashbug* /usr/share/*
+ removefrom bind-utils /usr/bin/host /usr/bin/nsupdate
+-removefrom bitmap-fangsongti-fonts /usr/share/fonts/*
++## removefrom bitmap-fangsongti-fonts /usr/share/fonts/*
+ removefrom ca-certificates /etc/pki/java/*
+ removefrom ca-certificates /etc/pki/tls/certs/ca-bundle.trust.crt
+ removefrom cairo /usr/${libdir}/libcairo-script* /usr/bin/cairo-sphinx
+diff -Naru lorax-lorax-34.1-1/share/templates.d/99-generic/runtime-install.tmpl lorax-lorax-34.1-1.bak/share/templates.d/99-generic/runtime-install.tmpl
+--- lorax-lorax-34.1-1/share/templates.d/99-generic/runtime-install.tmpl	2023-05-19 13:42:58.557962280 +0800
++++ lorax-lorax-34.1-1.bak/share/templates.d/99-generic/runtime-install.tmpl	2023-05-19 13:31:55.717962280 +0800
+@@ -5,7 +5,7 @@
+ installpkg anaconda anaconda-widgets kexec-tools-anaconda-addon anaconda-install-env-deps
+ ## Other available payloads
+ installpkg dnf
+-installpkg rpm-ostree ostree
++installpkg rpm
+ ## speed up compression on multicore systems
+ installpkg pigz
+ 
+@@ -106,7 +106,7 @@
+ 
+ ## extra storage packages
+ # hostname is needed for iscsi to work, see RHBZ#1593917
+-installpkg udisks2 udisks2-iscsi hostname
++installpkg udisks2 hostname
+ %if basearch in ("i386", "x86_64"):
+     installpkg fcoe-utils
+ %endif
+@@ -140,7 +140,7 @@
+ installpkg pciutils usbutils ipmitool
+ installpkg mt-st smartmontools
+ installpkg hdparm
+-%if basearch not in ("aarch64", "ppc64le", "s390x"):
++%if basearch not in ("aarch64", "ppc64le", "s390x", "sw_64"):
+ installpkg pcmciautils
+ %endif
+ ## see bug #1483278
+@@ -154,24 +154,24 @@
+ 
+ 
+ ## fonts & themes
+-installpkg aajohan-comfortaa-fonts
++## installpkg aajohan-comfortaa-fonts
+ installpkg abattis-cantarell-fonts
+-installpkg bitmap-fangsongti-fonts
++## installpkg bitmap-fangsongti-fonts
+ installpkg dejavu-sans-fonts dejavu-sans-mono-fonts
+ installpkg google-noto-sans-cjk-ttc-fonts
+-installpkg google-noto-sans-gurmukhi-fonts
+-installpkg google-noto-sans-sinhala-vf-fonts
++## installpkg google-noto-sans-gurmukhi-fonts
++## installpkg google-noto-sans-sinhala-vf-fonts
+ installpkg jomolhari-fonts
+-installpkg khmeros-base-fonts
+-installpkg lohit-assamese-fonts
+-installpkg lohit-bengali-fonts
+-installpkg lohit-devanagari-fonts
+-installpkg lohit-gujarati-fonts
+-installpkg lohit-kannada-fonts
+-installpkg lohit-marathi-fonts
+-installpkg lohit-odia-fonts
+-installpkg lohit-tamil-fonts
+-installpkg lohit-telugu-fonts
++## installpkg khmeros-base-fonts
++## installpkg lohit-assamese-fonts
++## installpkg lohit-bengali-fonts
++## installpkg lohit-devanagari-fonts
++## installpkg lohit-gujarati-fonts
++## installpkg lohit-kannada-fonts
++## installpkg lohit-marathi-fonts
++## installpkg lohit-odia-fonts
++## installpkg lohit-tamil-fonts
++## installpkg lohit-telugu-fonts
+ installpkg paktype-naskh-basic-fonts
+ installpkg sil-abyssinica-fonts
+ installpkg sil-padauk-fonts
+@@ -181,14 +181,14 @@
+ installpkg xorg-x11-fonts-misc
+ 
+ ## debugging/bug reporting tools
+-installpkg gdb-gdbserver
+-installpkg libreport-plugin-bugzilla libreport-plugin-reportuploader
++## installpkg gdb-gdbserver
++## installpkg libreport-plugin-bugzilla libreport-plugin-reportuploader
+ installpkg fpaste
+ installpkg python3-pyatspi
+ 
+ ## extra tools not required by anaconda
+ installpkg nano nano-default-editor
+-installpkg vim-minimal strace lsof dump xz less
++installpkg vim-minimal strace lsof xz less
+ installpkg wget rsync bind-utils ftp mtr vconfig
+ installpkg icfg spice-vdagent
+ installpkg gdisk hexedit sg3_utils
+diff -Naru lorax-lorax-34.1-1/share/templates.d/99-generic/sw64.tmpl lorax-lorax-34.1-1.bak/share/templates.d/99-generic/sw64.tmpl
+--- lorax-lorax-34.1-1/share/templates.d/99-generic/sw64.tmpl	1970-01-01 08:00:00.000000000 +0800
++++ lorax-lorax-34.1-1.bak/share/templates.d/99-generic/sw64.tmpl	2023-05-19 13:32:03.017962280 +0800
+@@ -0,0 +1,96 @@
++<%page args="kernels, runtime_img, runtime_base, basearch, inroot, outroot, product, isolabel"/>
++<%
++configdir="tmp/config_files/sw64"
++STAGE2IMG="isoft/sw64/root-image.fs.sfs"
++#BOOTDIR="isolinux"
++BOOTDIR="boot"
++ISOLINUXDIR="isolinux"
++LORAXDIR="usr/share/lorax/"
++
++## Don't allow spaces or escape characters in the iso label
++#def valid_label(ch):
++#    return ch.isalnum() or ch == '_'
++
++#isolabel = ''.join(ch if valid_label(ch) else '-' for ch in isolabel)
++
++import os
++from os.path import basename
++from pylorax.sysutils import joinpaths
++
++# Test the runtime_img, if it is > 4GiB we need to set -iso-level to 3
++if os.stat(joinpaths(inroot, runtime_img)).st_size >= 4*1024**3:
++    isoargs = "-iso-level 3"
++else:
++    isoargs = ""
++%>
++
++mkdir isoft/sw64
++install ${runtime_img} ${STAGE2IMG}
++treeinfo stage2 mainimage isoft/sw64/${runtime_base}
++
++## install bootloader and config files
++mkdir ${ISOLINUXDIR}
++install ${configdir}/isolinux.bin ${ISOLINUXDIR}
++install ${configdir}/isolinux.cfg ${ISOLINUXDIR}
++install ${configdir}/boot.msg ${ISOLINUXDIR}
++install ${configdir}/grub.conf ${ISOLINUXDIR}
++install usr/share/anaconda/boot/syslinux-splash.png ${ISOLINUXDIR}/splash.png
++install ${configdir}/isolinux/anaconda_configure_user.sh  ${ISOLINUXDIR}
++install ${configdir}/isolinux/.bashrc   ${ISOLINUXDIR}
++
++## configure bootloader
++replace @VERSION@ ${product.version} ${ISOLINUXDIR}/grub.conf ${ISOLINUXDIR}/isolinux.cfg ${ISOLINUXDIR}/*.msg
++replace @PRODUCT@ '${product.name}'  ${ISOLINUXDIR}/grub.conf ${ISOLINUXDIR}/isolinux.cfg ${ISOLINUXDIR}/*.msg
++replace @ROOT@ 'inst.stage2=hd:LABEL=${isolabel|udev}' ${ISOLINUXDIR}/isolinux.cfg
++
++## install kernels
++mkdir ${BOOTDIR}
++mkdir ${BOOTDIR}/grub
++mkdir ${BOOTDIR}/grub/fonts
++mkdir ${BOOTDIR}/grub/locale
++install ${configdir}/boot/bootloader.bin      ${BOOTDIR}
++install ${configdir}/boot/grub/grub.cfg       ${BOOTDIR}/grub/
++install ${configdir}/boot/grub/grub.efi       ${BOOTDIR}/grub/
++install ${configdir}/boot/grub/kernel.*       ${BOOTDIR}/grub/
++install ${configdir}/boot/grub/splash.xpm.gz  ${BOOTDIR}/grub/
++install ${configdir}/boot/grub/fonts/unicode.pf2       ${BOOTDIR}/grub/fonts/
++install ${configdir}/boot/grub/locale/zh_CN.mo         ${BOOTDIR}/grub/locale/
++
++%for kernel in kernels:
++    %if kernel.flavor:
++        ## i386 PAE
++        installkernel images-xen ${kernel.path} ${BOOTDIR}/vmlinuz-${kernel.flavor}
++        installinitrd images-xen ${kernel.initrd.path} ${BOOTDIR}/initrd-${kernel.flavor}.img
++    %else:
++        ## normal i386, x86_64
++        installkernel images-${basearch} ${kernel.path} ${BOOTDIR}/vmlinuz
++        installinitrd images-${basearch} ${kernel.initrd.path} ${BOOTDIR}/initrd.img
++    %endif
++%endfor
++
++replace @VERSION@ '${product.version}' ${BOOTDIR}/grub/grub.cfg 
++replace @PRODUCT@ '${product.name}'  ${BOOTDIR}/grub/grub.cfg 
++replace @LABEL@   '${isolabel|udev}' ${BOOTDIR}/grub/grub.cfg
++
++install ${configdir}/efibootimg  ${BOOTDIR}/../
++
++mkdir EFI
++mkdir EFI/BOOT
++mkdir EFI/BOOT/fonts
++mkdir EFI/BOOT/locale
++install ${configdir}/EFI/BOOT/BOOT.cfg      EFI/BOOT/
++install ${configdir}/EFI/BOOT/grub.cfg      EFI/BOOT/
++install ${configdir}/EFI/BOOT/grub.efi      EFI/BOOT/
++install ${configdir}/EFI/BOOT/kernel.*      EFI/BOOT/
++install ${configdir}/EFI/BOOT/splash.xpm.gz  EFI/BOOT/
++install ${configdir}/EFI/BOOT/fonts/unicode.pf2      EFI/BOOT/fonts/
++install ${configdir}/EFI/BOOT/locale/zh_CN.mo        EFI/BOOT/locale/
++
++## make boot.iso
++mkdir images
++runcmd xorrisofs ${isoargs} -o ${outroot}/images/boot.iso \
++       -b ${ISOLINUXDIR}/isolinux.bin -c ${ISOLINUXDIR}/boot.cat \
++       -boot-load-size 4 -boot-info-table -no-emul-boot \
++       -R -J -V '${isolabel}' \
++       ${outroot}
++treeinfo images-${basearch} boot.iso images/boot.iso
+diff -Naru lorax-lorax-34.1-1/src/pylorax/creator.py lorax-lorax-34.1-1.bak/src/pylorax/creator.py
+--- lorax-lorax-34.1-1/src/pylorax/creator.py	2020-09-15 05:55:20.000000000 +0800
++++ lorax-lorax-34.1-1.bak/src/pylorax/creator.py	2023-05-19 13:32:39.407962280 +0800
+@@ -51,7 +51,7 @@
+ DRACUT_DEFAULT = ["--xz", "--add", "livenet dmsquash-live dmsquash-live-ntfs convertfs pollcdrom qemu qemu-net",
+                   "--omit", "plymouth", "--no-hostonly", "--debug", "--no-early-microcode"]
+ 
+-RUNTIME = "images/install.img"
++RUNTIME = "isoft/sw64/root-image.fs.sfs"
+ 
+ class FakeDNF(object):
+     """
+@@ -332,7 +332,7 @@
+     :param opts: options passed to livemedia-creator
+     :type opts: argparse options
+     :param str mount_dir: Directory tree to compress
+-    :param str work_dir: Output compressed image to work_dir+images/install.img
++    :param str work_dir: Output compressed image to work_dir+isoft/sw64/root-image.fs.sfs
+ 
+     This uses wwood's squashfs live initramfs method:
+      * put the real / into LiveOS/rootfs.img
+@@ -350,7 +350,7 @@
+     # Link /images to work_dir/images to make the templates happy
+     if os.path.islink(joinpaths(mount_dir, "images")):
+         os.unlink(joinpaths(mount_dir, "images"))
+-    rc = execWithRedirect("/bin/ln", ["-s", joinpaths(work_dir, "images"),
++    rc = execWithRedirect("/bin/ln", ["-s", joinpaths(work_dir, "isoft/sw64"),
+                                      joinpaths(mount_dir, "images")])
+     if rc:
+         raise RuntimeError("Failed to symlink images from mount_dir to work_dir")
+@@ -525,9 +525,8 @@
+     sys_root = ""
+ 
+     squashfs_root_dir = joinpaths(work_dir, "squashfs_root")
+-    liveos_dir = joinpaths(squashfs_root_dir, "LiveOS")
+-    os.makedirs(liveos_dir)
+-    rootfs_img = joinpaths(liveos_dir, "rootfs.img")
++    os.makedirs(squashfs_root_dir)
++    rootfs_img = joinpaths(squashfs_root_dir, "root-image.fs")
+ 
+     if opts.fs_image or opts.no_virt:
+         # Find the ostree root in the fsimage
+@@ -569,7 +568,7 @@
+ 
+     log.info("Packing live rootfs image")
+     add_pxe_args = []
+-    live_image_name = "live-rootfs.squashfs.img"
++    live_image_name = "root-image.fs.sfs"
+     compression, compressargs = squashfs_args(opts)
+     rc = mksquashfs(squashfs_root_dir, joinpaths(work_dir, live_image_name), compression, compressargs)
+     if rc != 0:
+diff -Naru lorax-lorax-34.1-1/src/pylorax/__init__.py lorax-lorax-34.1-1.bak/src/pylorax/__init__.py
+--- lorax-lorax-34.1-1/src/pylorax/__init__.py	2023-05-19 13:38:47.357962280 +0800
++++ lorax-lorax-34.1-1.bak/src/pylorax/__init__.py	2023-05-19 13:32:33.807962280 +0800
+@@ -61,7 +61,7 @@
+ DRACUT_DEFAULT = ["--xz", "--install", "/.buildstamp", "--no-early-microcode", "--add", "fips"]
+ 
+ # Used for DNF conf.module_platform_id
+-DEFAULT_PLATFORM_ID = "platform:f32"
++DEFAULT_PLATFORM_ID = "platform:sw64"
+ 
+ class ArchData(DataHolder):
+     lib64_arches = ("x86_64", "ppc64le", "s390x", "ia64", "aarch64")
+@@ -309,7 +309,7 @@
+             rb.writepkgsizes(joinpaths(logdir, "final-pkgsizes.txt"))
+ 
+         logger.info("creating the runtime image")
+-        runtime = "images/install.img"
++        runtime = "isoft/sw64/root-image.fs.sfs"
+         compression = self.conf.get("compression", "type")
+         compressargs = self.conf.get("compression", "args").split()     # pylint: disable=no-member
+         if self.conf.getboolean("compression", "bcj"):
+diff -Naru lorax-lorax-34.1-1/src/pylorax/mount.py lorax-lorax-34.1-1.bak/src/pylorax/mount.py
+--- lorax-lorax-34.1-1/src/pylorax/mount.py	2020-09-15 05:55:20.000000000 +0800
++++ lorax-lorax-34.1-1.bak/src/pylorax/mount.py	2023-05-19 13:32:55.777962280 +0800
+@@ -67,7 +67,7 @@
+         else:
+             self.repo = None
+         self.stage2 = os.path.exists(self.mount_dir+"/LiveOS/squashfs.img") or \
+-                      os.path.exists(self.mount_dir+"/images/install.img")
++                      os.path.exists(self.mount_dir+"/isoft/sw64/root-image.fs.sfs")
+ 
+         try:
+             for kernel, initrd in kernel_list:
+diff -Naru lorax-lorax-34.1-1/src/pylorax/treebuilder.py lorax-lorax-34.1-1.bak/src/pylorax/treebuilder.py
+--- lorax-lorax-34.1-1/src/pylorax/treebuilder.py	2023-05-19 13:38:47.357962280 +0800
++++ lorax-lorax-34.1-1.bak/src/pylorax/treebuilder.py	2023-05-19 13:32:45.077962280 +0800
+@@ -42,6 +42,7 @@
+     'aarch64': 'aarch64.tmpl',
+     'arm':     'arm.tmpl',
+     'armhfp':  'arm.tmpl',
++    "sw_64":   'sw64.tmpl'
+ }
+ 
+ def generate_module_info(moddir, outfile=None):
+@@ -248,7 +249,7 @@
+ 
+         # Catch problems with the rootfs being too small and clearly log them
+         try:
+-            imgutils.mkrootfsimg(self.vars.root, joinpaths(workdir, "LiveOS/rootfs.img"),
++            imgutils.mkrootfsimg(self.vars.root, joinpaths(workdir, "root-image.fs"),
+                                  "Anaconda", size=size)
+         except CalledProcessError as e:
+             if e.stdout and "No space left on device" in e.stdout:
+@@ -256,7 +257,7 @@
+             raise
+ 
+         # squash the live rootfs and clean up workdir
+-        rc = imgutils.mksquashfs(workdir, outfile, compression, compressargs)
++        rc = imgutils.mksquashfs(joinpaths(workdir, "root-image.fs"), outfile, compression, compressargs)
+         remove(workdir)
+         return rc
+
