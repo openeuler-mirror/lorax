@@ -1,3 +1,7 @@
+From: isoft <wenjuan.qiu@i-soft.com.cn>
+Date: Fri, 28 Oct 2022 02:43:32 +0000
+Subject: Patch sw64 modify
+
 diff -Naru lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/boot.msg lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/boot.msg
 --- lorax-lorax-34.1-1/share/templates.d/99-generic/live/config_files/sw64/boot.msg	1970-01-01 08:00:00.000000000 +0800
 +++ lorax-lorax-34.1-1.bak/share/templates.d/99-generic/live/config_files/sw64/boot.msg	2023-05-19 13:31:05.147962280 +0800
