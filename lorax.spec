@@ -31,11 +31,7 @@ Patch16:        add-param-name_prefix-to-make-name-used-by-register_blueprint-un
 Patch100:	0001-support-loongarch-for-lorax.patch
 
 %ifarch sw_64
-Patch200:        0001-sw64-modify.patch
-Patch201:        0002-sw64-modify.patch
-Patch202:        runtime-tmpl-sw64.patch
-Patch203:        0001-sw64-tmpl-label-modify.patch
-Patch204:        0001-sw64-tmpl-and-treebuild-modify.patch
+Patch200:        0001-add-sw64-architecture.patch
 %endif
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
@@ -150,10 +146,6 @@ build images, etc. from the command line.
 
 %ifarch sw_64
 %patch200 -p1
-%patch201 -p1
-%patch202 -p1
-%patch203 -p1
-%patch204 -p1
 %endif
 
 %build
