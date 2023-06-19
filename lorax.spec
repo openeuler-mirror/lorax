@@ -3,14 +3,14 @@
 
 Name:           lorax
 Version:        34.1
-Release:        3 
+Release:        4
 Summary:        A set of tools used to create bootable images
 License:        GPLv2+
 URL:            https://github.com/weldr/lorax
 Source0:        https://github.com/weldr/lorax/archive/%{name}-%{version}-1.tar.gz
-%ifarch sw_64
 Source1:        sw64.tar.gz
-%endif
+Source2:        0001-support-loongarch-for-lorax.patch
+Source3:        0001-add-sw64-architecture.patch
 
 Patch0:		0001-ignore-the-dir-that-without-kernel-version.patch
 Patch1:		0001-add-text-mode-selection-menu-in-grub-configuration.patch
@@ -28,10 +28,11 @@ Patch12:	backport-Improve-lmc-no-virt-error-handling.patch
 Patch13:	backport-Add-POSTIN-scriptlet-error-to-the-log-monitor-list.patch
 Patch14:	backport-Remove-LD_PRELOAD-libgomp.so.1-from-lmc-no-virt.patch
 Patch16:        add-param-name_prefix-to-make-name-used-by-register_blueprint-unique.patch
+%ifarch loongarch64
 Patch100:	0001-support-loongarch-for-lorax.patch
-
+%endif
 %ifarch sw_64
-Patch200:        0001-add-sw64-architecture.patch
+Patch200:       0001-add-sw64-architecture.patch
 %endif
 
 BuildRequires:  python3-devel python3-sphinx_rtd_theme python3-magic 
@@ -232,6 +233,12 @@ getent passwd weldr >/dev/null 2>&1 || useradd -r -g weldr -d / -s /sbin/nologin
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Jun 19 2023 xinghe <xinghe2@h-partners.com> - 34.1-4
+- Type:bugfix
+- ID:NA
+- SUG:NA
+- DESC:ensure that the src package contains the loongson and sw patches
+
 * Mon Dec 11 2022 qiuwenjuan <wenjuan.qiu@i-soft.com.cn> - 34.1-3
 - Type:requirement
 - ID:NA
